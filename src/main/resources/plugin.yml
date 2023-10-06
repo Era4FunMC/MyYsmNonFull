@@ -1,0 +1,52 @@
+name: MyYSM
+version: '1.0'
+author: EarthMe
+description: "Simple plugin could make the ysm be usable on plugin servers"
+website: https://github.com/Era4FunMC/
+main: me.earthme.mysm.MyYSM
+api-version: '1.20'
+
+folia-supported: true
+
+depend:
+  - MCKotlin-Paper
+
+commands:
+  playanimationonplayer:
+    description: Playe animation on player
+    usage: "§cCorrect usage:/playanimationonplayer <player> <animation>"
+  gmodeltp:
+    description: Give a auth-needed model to the target player
+    usage: "§cCorrect usage: /gmodeltp <playerName> <modelLocation>"
+  smodelna:
+    description: Set the model is auth-needed
+    usage: "§cCorrect usage: /smodelna <modelLocation> <true/false>"
+  reloadmodels:
+    description: Reload all models
+    usage: "§cCorrect usage: /reload"
+  listysmplayers:
+    description: List the players who installed ysm
+    usage: "§cCorrect usage: /listysmplayers"
+  dmodelfp:
+    description: Drop the model for player
+    usage: "§cCorrect usage: /dmodelfp <playerName> <modelLocation>"
+
+permissions:
+  myysm.commands.playanimationonplayer:
+    default: false
+    description: Permission to execute playanimationonplayer
+  myysm.commands.dmodelfp:
+    default: false
+    description: Permission to drop the model for player
+  myysm.commands.gmodeltp:
+    default: false
+    description: Permission of gmodeltp command(Give a auth-needed model to the target player)
+  myysm.commands.reload:
+    default: false
+    description: Permission to reload all models
+  myysm.commands.listysmplayers:
+    default: true
+    description: Permission to list the players who installed ysm
+  myysm.model.management:
+    default: false
+    description: Management the models

@@ -1,0 +1,54 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+}
+
+group = 'gg.earthme.mysm'
+version = '1.0-SNAPSHOT'
+archivesBaseName = 'MyYsm-shadowed'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'papermc'
+        url = 'https://repo.papermc.io/repository/maven-public/'
+    }
+
+    maven {
+        url "https://repo.dmulloy2.net/repository/public/"
+    }
+
+    maven{
+        url "https://repo.viaversion.com"
+    }
+}
+
+dependencies {
+    compileOnly fileTree('libs')
+    compileOnly 'dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT'
+    compileOnly 'io.netty:netty-all:4.1.86.Final'
+    compileOnly("com.viaversion:viaversion-api:4.8.1")
+    implementation 'com.alibaba:fastjson:1.2.83'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir(layout.buildDirectory.dir("src/main/resources/ysm_data"))
+        }
+    }
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = '17'
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '17'
+}

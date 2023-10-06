@@ -1,0 +1,40 @@
+{
+  "versionMetas": [
+    {
+      "downloadLink": "https://mediafilez.forgecdn.net/files/4702/502/yesstevemodel-1.20-fabric-release-1.1.5-hotfix-2.jar",
+      "dataClassName": "com.elfmcys.yesstevemodel.o0OOO0o000o0o0o0OOoO000o",
+      "version": 763,
+      "modLoader": "fabric"
+    },
+    {
+      "downloadLink": "https://mediafilez.forgecdn.net/files/4702/500/yesstevemodel-1.19.2-fabric-release-1.1.5-hotfix-2.jar",
+      "dataClassName": "com.elfmcys.yesstevemodel.o0OOO0o000o0o0o0OOoO000o",
+      "version": 760,
+      "modLoader": "fabric"
+    },
+    {
+      "downloadLink": "https://mediafilez.forgecdn.net/files/4702/498/yesstevemodel-1.18.2-fabric-release-1.1.5-hotfix-2.jar",
+      "dataClassName": "com.elfmcys.yesstevemodel.OoO0Oo0OO00O0oo0o000o0oO",
+      "version": 758,
+      "modLoader": "fabric"
+    },
+    {
+      "downloadLink": "https://mediafilez.forgecdn.net/files/4667/61/yesstevemodel-1.20-release-1.1.5-hotfix-2.jar",
+      "dataClassName": "com.elfmcys.yesstevemodel.oO0OoOoO0OOo0ooo00Ooo0oo",
+      "version": 763,
+      "modLoader": "forge"
+    },
+    {
+      "downloadLink": "https://mediafilez.forgecdn.net/files/4667/57/yesstevemodel-1.19.2-release-1.1.5-hotfix-2.jar",
+      "dataClassName": "com.elfmcys.yesstevemodel.oO0OoOoO0OOo0ooo00Ooo0oo",
+      "version": 762,
+      "modLoader": "forge"
+    },
+    {
+      "downloadLink": "https://mediafilez.forgecdn.net/files/4667/56/yesstevemodel-1.18.2-release-1.1.5-hotfix-2.jar",
+      "dataClassName": "com.elfmcys.yesstevemodel.oO0OoOoO0OOo0ooo00Ooo0oo",
+      "version": 758,
+      "modLoader": "forge"
+    }
+  ]
+}
