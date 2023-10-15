@@ -1,8 +1,9 @@
 package me.earthme.mysm.connection
 
-import com.viaversion.viaversion.api.Via
+import com.github.retrooper.packetevents.PacketEvents
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import me.earthme.mysm.SchedulerUtils
 import me.earthme.mysm.data.PlayerModelData
 import me.earthme.mysm.events.PlayerChangeModelEvent
 import me.earthme.mysm.manager.ModelPermissionManager
@@ -12,7 +13,7 @@ import me.earthme.mysm.network.MainYsmNetworkHandler
 import me.earthme.mysm.network.MainYsmNetworkHandler.getConnection
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.utils.network.YsmPacketHelper
-import me.earthme.mysm.utils.nms.MCPacketCodecUtils
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import me.earthme.mysm.utils.ysm.EncryptUtils
 import me.earthme.mysm.utils.ysm.MiscUtils
 import org.bukkit.Bukkit
@@ -25,33 +26,28 @@ class FabricPlayerYsmConnection(
     private val pluginInstance: Plugin
 ) : PlayerYsmConnection{
     companion object{
-        val NETWORK_CHANNEL_NAMESPACE = "yes_steve_model"
-        val NETWORK_CHANNELS_INGOING = listOf("yes_steve_model:0","yes_steve_model:5","yes_steve_model:7")
-        val NETWORK_CHANNELS_OUTGOING = listOf("yes_steve_model:1","yes_steve_model:2","yes_steve_model:3","yes_steve_model:4")
+        const val NETWORK_CHANNEL_NAMESPACE = "yes_steve_model"
+    }
 
-        fun registerChannels(pluginInstance: Plugin){
-            for (channel in NETWORK_CHANNELS_INGOING){
-                Bukkit.getServer().messenger.registerIncomingPluginChannel(pluginInstance,channel,MainYsmNetworkHandler.PluginMessageListenerYSM())
-            }
-
-            for (channel in NETWORK_CHANNELS_OUTGOING){
-                Bukkit.getServer().messenger.registerOutgoingPluginChannel(pluginInstance,channel)
-            }
+    override fun isChannelNameMatched(channel: String): Boolean {
+        if (channel == "$NETWORK_CHANNEL_NAMESPACE:network"){
+            return false
         }
+
+        val split = channel.split(":")
+
+        if (split.size != 2){
+            return false
+        }
+
+        return split[0] == NETWORK_CHANNEL_NAMESPACE
     }
 
     override fun tick() {
         val playerData = PlayerDataManager.createOrGetPlayerData(this.player.name)
         if (playerData.sendAnimation){
             for (singlePlayer in Bukkit.getOnlinePlayers()){
-                val otherConnection =  singlePlayer.getConnection()
-                if (otherConnection is FabricPlayerYsmConnection){
-                    otherConnection.sendModelUpdate(this.player)
-                }
-
-                if (otherConnection is ForgePlayerYsmConnection){
-                    otherConnection.sendModelUpdate(this.player)
-                }
+                singlePlayer.getConnection()?.sendModelUpdate(this.player)
             }
             playerData.sendAnimation = false
         }
@@ -84,12 +80,14 @@ class FabricPlayerYsmConnection(
     override fun onMessageIncoming(key: NamespacedKey, packetData: ByteArray) {
         val resourceLocationStringSplit = key.toString().split(":")
         if (resourceLocationStringSplit.size == 2 && resourceLocationStringSplit[0] == YsmPacketHelper.NETWORK_CHANNEL_NAMESPACE){
-            this.processInternal(resourceLocationStringSplit[1], Unpooled.wrappedBuffer(packetData))
+            SchedulerUtils.schedulerAsExecutor(this.player.location).execute {
+                this.processInternal(resourceLocationStringSplit[1], Unpooled.wrappedBuffer(packetData))
+            }
         }
     }
 
     private fun processInternal(idString: String,byteBuf: ByteBuf){
-        val playerProtocolVersion = Via.getAPI().getPlayerVersion(this.player)
+        val playerProtocolVersion = PacketEvents.getAPI().playerManager.getClientVersion(this.player).protocolVersion
         when(Integer.parseInt(idString)){
             5 -> {
                 //TODO Limit the packet speed?
@@ -106,14 +104,7 @@ class FabricPlayerYsmConnection(
                     targetData.isDirty = true
 
                     for (singlePlayer in Bukkit.getOnlinePlayers()){
-                        val otherConnection =  singlePlayer.getConnection()
-                        if (otherConnection is FabricPlayerYsmConnection){
-                            otherConnection.sendModelUpdate(this.player)
-                        }
-
-                        if (otherConnection is ForgePlayerYsmConnection){
-                            otherConnection.sendModelUpdate(this.player)
-                        }
+                        singlePlayer.getConnection()?.sendModelUpdate(this.player)
                     }
 
                     this.pluginInstance.logger.info("Player ${this.player.name} has changed model to $targetModelResourceLocation")
@@ -167,35 +158,35 @@ class FabricPlayerYsmConnection(
         }
     }
 
-    fun sendHeldModes(models: Set<NamespacedKey>){
+    override fun sendHeldModes(models: Set<NamespacedKey>){
         val channelName = NamespacedKey(NETWORK_CHANNEL_NAMESPACE,"6")
         val dataBuf = YsmPacketHelper.heldModelsData(Unpooled.buffer(),models)
 
         this.sendPacket(dataBuf,channelName)
     }
 
-    fun sendReload(){
+    override fun sendReload(){
         val channelName = NamespacedKey(NETWORK_CHANNEL_NAMESPACE,"2")
         val dataBuf: ByteBuf = YsmPacketHelper.reloadPacketData(Unpooled.buffer())
 
         this.sendPacket(dataBuf,channelName)
     }
 
-    fun sendModelUpdate(ownerEntity: Player){
+    override fun sendModelUpdate(ownerEntity: Player){
         val channelName = NamespacedKey(NETWORK_CHANNEL_NAMESPACE,"4")
         val dataBuf = YsmPacketHelper.modelUpdatePacketData(Unpooled.buffer(),ownerEntity)
 
         this.sendPacket(dataBuf,channelName)
     }
 
-    fun sendMd5Contained(containedMd5: String){
+    override fun sendMd5Contained(containedMd5: String){
         val channelName = NamespacedKey(NETWORK_CHANNEL_NAMESPACE,"3")
         val dataBuffer: ByteBuf = YsmPacketHelper.md5ContainedPacketData(Unpooled.buffer(),containedMd5)
 
         this.sendPacket(dataBuffer,channelName)
     }
 
-    fun sendModelOrPasswordData(data: ByteArray){
+    override fun sendModelOrPasswordData(data: ByteArray){
         val channelName = NamespacedKey(NETWORK_CHANNEL_NAMESPACE,"1")
         val dataBuf: ByteBuf = YsmPacketHelper.cacheDataPacketData(Unpooled.buffer(),data)
 

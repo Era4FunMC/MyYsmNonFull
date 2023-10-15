@@ -79,7 +79,7 @@ object FileUtils {
 
     fun forEachFolder(folder: File,action: Consumer<File>){
         if (!folder.isDirectory){
-            throw IllegalArgumentException()
+            return
         }
 
         folder.listFiles()?.let{

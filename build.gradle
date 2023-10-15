@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'gg.earthme.mysm'
-version = '1.0-SNAPSHOT'
+version = '1.2-Aplaha'
 archivesBaseName = 'MyYsm-shadowed'
 
 repositories {
@@ -21,13 +21,16 @@ repositories {
     maven{
         url "https://repo.viaversion.com"
     }
+
+    maven {
+        url "https://repo.codemc.io/repository/maven-releases/"
+    }
 }
 
 dependencies {
-    compileOnly fileTree('libs')
+    compileOnly 'com.github.retrooper.packetevents:spigot:2.0.2'
     compileOnly 'dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT'
     compileOnly 'io.netty:netty-all:4.1.86.Final'
-    compileOnly("com.viaversion:viaversion-api:4.8.1")
     implementation 'com.alibaba:fastjson:1.2.83'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'

@@ -1,9 +1,18 @@
 package me.earthme.mysm.network
 
+import com.github.retrooper.packetevents.event.PacketListenerPriority
+import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract
+import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent
+import com.github.retrooper.packetevents.protocol.packettype.PacketType
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage
+import io.netty.buffer.Unpooled
+import me.earthme.mysm.SchedulerUtils
 import me.earthme.mysm.connection.FabricPlayerYsmConnection
 import me.earthme.mysm.connection.ForgePlayerYsmConnection
 import me.earthme.mysm.connection.PlayerYsmConnection
 import me.earthme.mysm.utils.AsyncExecutor
+import me.earthme.mysm.utils.network.YsmPacketHelper
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -13,13 +22,12 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.Plugin
-import org.bukkit.plugin.messaging.PluginMessageListener
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.LockSupport
 
 
-object MainYsmNetworkHandler : Listener{
+object MainYsmNetworkHandler : Listener, SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
     private val tickExecutor: Executor = CompletableFuture.delayedExecutor(50,TimeUnit.MILLISECONDS, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE)
 
     private val shouldTickNext: AtomicBoolean = AtomicBoolean(true)
@@ -72,7 +80,9 @@ object MainYsmNetworkHandler : Listener{
 
             try {
                 for (singlePlayer in  Bukkit.getOnlinePlayers()){
-                    connectionMap[singlePlayer]?.tick()
+                    SchedulerUtils.schedulerAsExecutor(singlePlayer.location).execute {
+                        connectionMap[singlePlayer]?.tick()
+                    }
                 }
             }catch (e: Exception){
                 e.printStackTrace()
@@ -82,21 +92,13 @@ object MainYsmNetworkHandler : Listener{
         }
     }
 
-    fun Player.getConnection(): PlayerYsmConnection{
-        return connectionMap[this]!!
+    fun Player.getConnection(): PlayerYsmConnection?{
+        return connectionMap[player]
     }
 
     @EventHandler
-    fun onPlayerJoin(playerJoinEvent: PlayerJoinEvent){
-        this.connectionMap[playerJoinEvent.player] = if (playerJoinEvent.player.clientBrandName == "forge"){
-            ForgePlayerYsmConnection(playerJoinEvent.player,this.pluginInstance!!)
-        }else{
-            FabricPlayerYsmConnection(playerJoinEvent.player,this.pluginInstance!!)
-        }
-
-        this.connectionMap[playerJoinEvent.player]!!.onPlayerJoin(playerJoinEvent.player)
-        //Refresh tracker once
-        this.updateTracker(playerJoinEvent.player)
+    fun onPlayerJoin(playerJoinEvent: PlayerJoinEvent) {
+        YsmPacketHelper.attachChannelForPlayer(playerJoinEvent.player)
     }
 
     //TODO Optimize
@@ -123,24 +125,23 @@ object MainYsmNetworkHandler : Listener{
     }
 
     private fun playerTrackedPlayer(player: Player, hasSeen: Player){
-        player.getConnection().onTrackerUpdate(hasSeen)
+        player.getConnection()?.onTrackerUpdate(hasSeen)
     }
     
     @EventHandler
     fun onPlayerLeftGame(playerQuitEvent: PlayerQuitEvent){
-        playerQuitEvent.player.getConnection().onPlayerLeft(playerQuitEvent.player)
+        if (!this.connectionMap.containsKey(playerQuitEvent.player)){
+            return
+        }
+
+        playerQuitEvent.player.getConnection()?.onPlayerLeft(playerQuitEvent.player)
         this.connectionMap.remove(playerQuitEvent.player)
     }
 
     fun sendReloadToAllPlayers(){
         //Broadcast to all
         for (player in Bukkit.getOnlinePlayers()){
-            val connection = player.getConnection()
-            if (connection is FabricPlayerYsmConnection){
-                connection.sendReload()
-            }else if (connection is ForgePlayerYsmConnection){
-                connection.sendReload()
-            }
+            player.getConnection()?.sendReload()
         }
     }
 
@@ -148,10 +149,37 @@ object MainYsmNetworkHandler : Listener{
         return this.modInstalledPlayerList //Return a immutable list
     }
 
-    //Inbound packet receiver
-    class PluginMessageListenerYSM : PluginMessageListener {
-        override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray?) {
-            player.getConnection().onMessageIncoming(NamespacedKey.fromString(channel)!!,message!!)
+    override fun onPacketPlayReceive(event: PacketPlayReceiveEvent){
+        if (event.packetType == PacketType.Play.Client.PLUGIN_MESSAGE){
+            val player: Player = event.player as Player
+            val wrappedPluginMessage = WrapperPlayClientPluginMessage(event)
+
+            val channelName = wrappedPluginMessage.channelName
+            val channelData = wrappedPluginMessage.data
+
+            this.connectionMap[player]?.let{
+                if (it.isChannelNameMatched(channelName)){
+                    it.onMessageIncoming(NamespacedKey.fromString(channelName)!!,channelData)
+                }
+            }
+
+            if (channelName == "minecraft:brand"){
+                val wrappedData = Unpooled.copiedBuffer(channelData)
+                val brand = MCPacketCodecUtils.readUtf(32767,wrappedData)
+
+                if (this.connectionMap.containsKey(player)){
+                    return
+                }
+
+                this.connectionMap[player] = if (brand.contains("fabric")){
+                    FabricPlayerYsmConnection(player,this.pluginInstance!!)
+                }else{
+                    ForgePlayerYsmConnection(player,this.pluginInstance!!)
+                }
+
+                player.getConnection()?.onPlayerJoin(player)
+                this.updateTracker(player)
+            }
         }
     }
 }

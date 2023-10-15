@@ -1,9 +1,7 @@
 package me.earthme.mysm.manager
 
-import me.earthme.mysm.data.YsmModelFileInstance
-import me.earthme.mysm.data.YsmPasswordFileInstance
-import me.earthme.mysm.data.YsmVersionMeta
-import me.earthme.mysm.data.YsmVersionMetaArray
+import com.google.common.collect.Lists
+import me.earthme.mysm.data.*
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.utils.FileUtils
 import me.earthme.mysm.utils.HttpsUtils
@@ -19,13 +17,14 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Consumer
 import java.util.function.Function
 import java.util.logging.Level
+import java.util.stream.Collectors
 import kotlin.collections.ArrayList
 
 object MultiSupportedVersionCacheManager {
     private val versionMetaMap: MutableSet<YsmVersionMeta> = ConcurrentHashMap.newKeySet()
     private val loadCacheMap: MutableMap<YsmVersionMeta,URLClassLoader> = ConcurrentHashMap()
-    private val loadedModel: MutableMap<String,MutableMap<YsmVersionMeta,String>> = ConcurrentHashMap()
-    private val loadedModelFile: MutableMap<String,File> = ConcurrentHashMap()
+    private val modelToVersion2Caches: MutableMap<String,MutableMap<YsmVersionMeta,String>> = ConcurrentHashMap()
+    private val loadedYsmModelData: MutableMap<String,YsmModelData> = ConcurrentHashMap()
 
     private var baseCacheDir: File = File("caches")
     private var modJarFolder: File = File("modjars")
@@ -44,13 +43,13 @@ object MultiSupportedVersionCacheManager {
 
     private fun dropAll(){
         this.loadCacheMap.clear()
-        this.loadedModel.clear()
-        this.loadedModelFile.clear()
+        this.modelToVersion2Caches.clear()
+        this.loadedYsmModelData.clear()
     }
 
     fun refreshCache(modelName: String){
         val needToRemove: MutableList<File> = ArrayList()
-        for ((version,fileName) in loadedModel[modelName]!!){
+        for ((version,fileName) in modelToVersion2Caches[modelName]!!){
             val targetFolder = File(baseCacheDir,"version_${version.version}_${version.modLoader}")
             val targetFile = File(targetFolder,fileName)
 
@@ -62,9 +61,7 @@ object MultiSupportedVersionCacheManager {
         }
 
         for (singleVersion in versionMetaMap){
-            val targetFile = this.loadedModelFile[modelName]!!
-
-            this.writeToCache(targetFile,singleVersion)
+            this.writeToCache(modelName,singleVersion)
         }
     }
     
@@ -83,7 +80,7 @@ object MultiSupportedVersionCacheManager {
     }
 
     fun getCacheDataWithMd5(md5Excludes: List<String>,actionIfNotContained: Consumer<ByteArray>,actionIfContained: Consumer<String>,version: YsmVersionMeta){
-        for (entry in loadedModel){
+        for (entry in modelToVersion2Caches){
             val version2Model = entry.value
             val md5WithFileName = version2Model[version]!!
             if (md5Excludes.contains(md5WithFileName)){
@@ -97,44 +94,36 @@ object MultiSupportedVersionCacheManager {
         }
     }
 
-    fun writeAllModelsToCache(){
-        if (modelDir.mkdir()){
+    private fun writeAllModelsToCache(){
+        if (loadedYsmModelData.isEmpty()){
             return
         }
 
-        modelDir.listFiles()?.let{
-            CompletableFuture.allOf(
-                *Arrays.stream(it)
-                    .map { file -> CompletableFuture.runAsync({
-                        try {
-                            if (!file.isDirectory){
-                                return@runAsync
-                            }
-
-                            for (singleVersionMeta in versionMetaMap){
-                                writeToCache(file,singleVersionMeta)
-                            }
-
-                            loadedModelFile[FileUtils.fileNameWithoutExtension(file.name)] = file
-                        }catch (e: Exception){
-                            this.pluginInstance!!.logger.log(Level.SEVERE,"Error while loading model ${file.name}!",e)
+        CompletableFuture.allOf(
+            *loadedYsmModelData.keys.stream()
+                .map { name -> CompletableFuture.runAsync({
+                    try {
+                        for (singleVersionMeta in versionMetaMap){
+                            writeToCache(name,singleVersionMeta)
                         }
-                    }, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE) }
-                    .toArray { i -> arrayOfNulls(i) }
-            ).join()
-        }
+                    }catch (e: Exception){
+                        this.pluginInstance!!.logger.log(Level.SEVERE,"Error while loading model ${name}!",e)
+                    }
+                }, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE) }
+                .toArray { i -> arrayOfNulls(i) }
+        ).join()
+        this.pluginInstance!!.logger.info("Loaded ${this.modelToVersion2Caches.size} caches!")
     }
 
     fun getPasswordData(): ByteArray{
         return this.passwordFileInstance.data
     }
 
-    private fun writeToCache(fileModelFile: File, version: YsmVersionMeta){
+    private fun writeToCache(modelName: String, version: YsmVersionMeta){
         val dataClassLoader: URLClassLoader = getCacheDataClassLoaderForVersion(version)!!
-        val modelFileInstance: YsmModelFileInstance = YsmModelFileInstance.createFromFolder(
-            arrayListOf(*fileModelFile.listFiles()!!),
-            fileModelFile.name,
-            Function { return@Function this.needModelAuth(it) },
+        val modelData = this.loadedYsmModelData[modelName]!!
+        val modelFileInstance: WrappedYsmCacheFileInstance = WrappedYsmCacheFileInstance.createFromModelData(
+            modelData,
             dataClassLoader.loadClass(version.dataClassName),
             dataClassLoader as ClassLoader
         )
@@ -147,11 +136,11 @@ object MultiSupportedVersionCacheManager {
         val targetCacheFile = File(targetFolder,fileName)
         Files.write(targetCacheFile.toPath(),cacheData)
 
-        if (!loadedModel.containsKey(modelFileInstance.getModelName())) {
-            loadedModel[modelFileInstance.getModelName()] = ConcurrentHashMap()
+        if (!modelToVersion2Caches.containsKey(modelFileInstance.getModelName())) {
+            modelToVersion2Caches[modelFileInstance.getModelName()] = ConcurrentHashMap()
         }
 
-        loadedModel[modelFileInstance.getModelName()]!![version] = fileName
+        modelToVersion2Caches[modelFileInstance.getModelName()]!![version] = fileName
     }
 
     private fun needModelAuth(modelName: String): Boolean{
@@ -205,7 +194,38 @@ object MultiSupportedVersionCacheManager {
         }
     }
 
-    fun dropAllCaches(){
+    private fun loadAllModels(){
+        modelDir.listFiles()?.let{
+            CompletableFuture.allOf(
+                *Arrays.stream(it)
+                    .map { file -> CompletableFuture.runAsync({
+                        try {
+                            val fileName = file.name
+                            val authChecker: Function<String,Boolean> = Function { return@Function this.needModelAuth(fileName) }
+
+                            if (file.isDirectory){
+                                this.pluginInstance!!.logger.info("Loading model $fileName as a directory")
+                                val files = Arrays.stream(file.listFiles()!!).collect(Collectors.toList())
+                                val ysmModelData = YsmModelData.createFromFolder(files,fileName,authChecker)
+                                this.loadedYsmModelData[ysmModelData.getModelName()] = ysmModelData
+                            }else{
+                                /*this.pluginInstance!!.logger.info("Loading model $fileName as a file")
+                                if (fileName.endsWith(".ysm")){
+                                    val ysmModelData = YsmModelData.createFromYsmFile(file,authChecker)
+                                    this.loadedYsmModelData[ysmModelData.getModelName()] = ysmModelData
+                                }*/
+                            }
+                        }catch (e: Exception){
+                            this.pluginInstance!!.logger.log(Level.SEVERE,"Error while loading model ${file.name}!",e)
+                        }
+                    }, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE) }
+                    .toArray { i -> arrayOfNulls(i) }
+            ).join()
+            this.pluginInstance!!.logger.info("Loaded ${this.loadedYsmModelData.size} model data!")
+        }
+    }
+
+    private fun dropAllCaches(){
         FileUtils.forEachFolder(baseCacheDir){
             try {
                 if (!it.isDirectory){
@@ -235,6 +255,7 @@ object MultiSupportedVersionCacheManager {
         this.dropAllCaches()
         this.loadVersionMeta()
         this.downloadModJars()
+        this.loadAllModels()
         this.writeAllModelsToCache()
     }
 }

@@ -1,4 +1,4 @@
-package me.earthme.mysm.utils.nms
+package me.earthme.mysm.utils.mc
 
 import io.netty.buffer.ByteBuf
 import io.netty.handler.codec.DecoderException

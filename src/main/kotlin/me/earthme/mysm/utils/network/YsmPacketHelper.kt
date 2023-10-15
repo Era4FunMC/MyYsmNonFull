@@ -1,10 +1,11 @@
 package me.earthme.mysm.utils.network
 
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage
 import io.netty.buffer.ByteBuf
-import io.netty.buffer.Unpooled
-import me.earthme.mysm.NMSUtils
+import me.earthme.mysm.YsmNbtUtils
 import me.earthme.mysm.manager.PlayerDataManager
-import me.earthme.mysm.utils.nms.MCPacketCodecUtils
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import org.bukkit.NamespacedKey
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
@@ -12,8 +13,8 @@ import java.lang.reflect.Method
 
 object YsmPacketHelper {
     const val NETWORK_CHANNEL_NAMESPACE = "yes_steve_model"
-    val NETWORK_CHANNELS_INGOING = listOf("yes_steve_model:0","yes_steve_model:5","yes_steve_model:7")
-    val NETWORK_CHANNELS_OUTGOING = listOf("yes_steve_model:1","yes_steve_model:2","yes_steve_model:3","yes_steve_model:4")
+    val NETWORK_CHANNELS_INGOING = listOf("yes_steve_model:0","yes_steve_model:5","yes_steve_model:7","yes_steve_model:network")
+    val NETWORK_CHANNELS_OUTGOING = listOf("yes_steve_model:1","yes_steve_model:2","yes_steve_model:3","yes_steve_model:4","yes_steve_model:network")
 
     fun attachChannelForPlayer(player: Player){
         for (channel in NETWORK_CHANNELS_INGOING){
@@ -50,23 +51,28 @@ object YsmPacketHelper {
     }
 
     fun reloadPacketData(dataBuf: ByteBuf): ByteBuf{
-        dataBuf.writeByte(1) //Garbage message
+        //dataBuf.writeByte(1) //Garbage message
         return dataBuf
     }
 
     fun sendCustomPayLoad(target: Player, channel: NamespacedKey, data: ByteBuf){
-        //TODO Prevent using nms
-        NMSUtils.sendPacket(target, NMSUtils.wrapNewCustomPacket(NMSUtils.wrapNewResourceLocation(channel), NMSUtils.wrapNewFriendlyByteBuf(data)))
+        val byteArray = ByteArray(data.readableBytes())
+        data.readBytes(byteArray)
+        PacketEvents.getAPI().playerManager.sendPacket(target,WrapperPlayServerPluginMessage(channel.toString(),byteArray))
     }
 
     fun modelUpdatePacketData(dataBuf: ByteBuf,ownerEntity: Player): ByteBuf{
         val modelData = PlayerDataManager.createOrGetPlayerData(ownerEntity.name)
         MCPacketCodecUtils.writeVarInt(ownerEntity.entityId,dataBuf) //What ? Entity id? Could we set the model of a non player entity?()
         MCPacketCodecUtils.writeUUID(ownerEntity.uniqueId,dataBuf) // UUID of target entity
+        dataBuf.writeBytes(YsmNbtUtils.createNbtForSync(modelData))
+        return dataBuf
+    }
 
-        val friendlyByteBuf = NMSUtils.wrapNewFriendlyByteBuf(dataBuf) //TODO Prevent using nms
-        NMSUtils.writeNbtToFriendlyByteBuf(NMSUtils.createNbtForSync(modelData),friendlyByteBuf) //TODO Prevent using nms
-
+    fun modelUpdatePacketDataForge(dataBuf: ByteBuf,ownerEntity: Player): ByteBuf{
+        val modelData = PlayerDataManager.createOrGetPlayerData(ownerEntity.name)
+        MCPacketCodecUtils.writeVarInt(ownerEntity.entityId,dataBuf) //What ? Entity id? Could we set the model of a non player entity?()
+        dataBuf.writeBytes(YsmNbtUtils.createNbtForSync(modelData))
         return dataBuf
     }
 

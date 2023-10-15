@@ -6,39 +6,25 @@ import me.earthme.mysm.ResourceConstants
 import me.earthme.mysm.utils.*
 import me.earthme.mysm.utils.ysm.*
 import me.earthme.mysm.utils.ysm.MiscUtils
-import org.jetbrains.annotations.Contract
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.io.IOException
-import java.nio.file.Files
 import java.security.spec.AlgorithmParameterSpec
-import java.util.function.Function
 import javax.crypto.SecretKey
 
-class YsmModelFileInstance (
+class WrappedYsmCacheFileInstance (
     private val modelName: String?,
     private var needAuth: Boolean,
-    val metaData: Map<String, ByteArray>?,
-    val animationData: Map<String, ByteArray>?,
-    val textureData: Map<String, ByteArray>?
+    private val metaData: Map<String, ByteArray>?,
+    private val animationData: Map<String, ByteArray>?,
+    private val textureData: Map<String, ByteArray>?
 ){
     companion object{
         private val GSON_CODEC = Gson()
 
-        @Contract("_, _, _ -> new")
-        fun createFromFolder(
-            filesInFolder: List<File>,
-            modelName: String,
-            needAuthChecker: Function<String,Boolean>,
-            dataClass: Class<*>,
-            dataClassLoader: ClassLoader
-        ) : YsmModelFileInstance{
-            val currentLoader: ClassLoader = YsmModelFileInstance::class.java.classLoader
+        fun createFromModelData(ysmModelData: YsmModelData,dataClass: Class<*>,dataClassLoader: ClassLoader): WrappedYsmCacheFileInstance{
+            val currentLoader = Thread.currentThread().contextClassLoader
             Thread.currentThread().contextClassLoader = dataClassLoader
             try {
-                val metaData: MutableMap<String, ByteArray> = Maps.newHashMap()
-                val animationData: MutableMap<String, ByteArray> = Maps.newHashMap()
-                val textureData: MutableMap<String, ByteArray> = Maps.newHashMap()
                 val missingFileNames: MutableList<String> = ArrayList(
                     listOf(
                         "main.json",
@@ -49,34 +35,35 @@ class YsmModelFileInstance (
                     )
                 )
 
-                for (singleUnknownFile in filesInFolder) {
-                    val fileName = if (singleUnknownFile.isDirectory) null else singleUnknownFile.name
-                    if (fileName != null) {
-                        val read = Files.readAllBytes(singleUnknownFile.toPath())
-                        missingFileNames.remove(fileName)
-                        if (!fileName.endsWith(".png")) {
-                            when (fileName) {
-                                "main.json" -> {
-                                    val encodedMainJson = GSON_CODEC.fromJson(String(read), dataClass)
-                                    val encodedMainObject: ByteArray = MiscUtils.objectToByteArray(encodedMainJson)
-                                    metaData["main"] = encodedMainObject
-                                }
+                val metaData: MutableMap<String, ByteArray> = Maps.newHashMap()
+                val animationData: MutableMap<String, ByteArray> = Maps.newHashMap()
+                val textureData: MutableMap<String, ByteArray> = Maps.newHashMap()
 
-                                "arm.json" -> {
-                                    val encodedArmJson = GSON_CODEC.fromJson(String(read), dataClass)
-                                    val encodedArmObject: ByteArray = MiscUtils.objectToByteArray(encodedArmJson)
-                                    metaData["arm"] = encodedArmObject
-                                }
-
-                                "main.animation.json" -> animationData["main"] = read
-                                "arm.animation.json" -> animationData["arm"] = read
-                                "extra.animation.json" -> animationData["extra"] = read
+                for ((fileName,data) in ysmModelData.getAllFiles()){
+                    missingFileNames.remove(fileName)
+                    if (!fileName.endsWith(".png")) {
+                        when (fileName) {
+                            "main.json" -> {
+                                val encodedMainJson = GSON_CODEC.fromJson(String(data), dataClass)
+                                val encodedMainObject: ByteArray = MiscUtils.objectToByteArray(encodedMainJson)
+                                metaData["main"] = encodedMainObject
                             }
-                        } else {
-                            textureData[fileName] = read
+
+                            "arm.json" -> {
+                                val encodedArmJson = GSON_CODEC.fromJson(String(data), dataClass)
+                                val encodedArmObject: ByteArray = MiscUtils.objectToByteArray(encodedArmJson)
+                                metaData["arm"] = encodedArmObject
+                            }
+
+                            "main.animation.json" -> animationData["main"] = data
+                            "arm.animation.json" -> animationData["arm"] = data
+                            "extra.animation.json" -> animationData["extra"] = data
                         }
+                    } else {
+                        textureData[fileName] = data
                     }
                 }
+
                 for (missingFileName in missingFileNames) {
                     require(!(missingFileName == "main.json" || missingFileName == "arm.json")) {
                         "Model meta has not found!Missing: $missingFileName"
@@ -89,26 +76,11 @@ class YsmModelFileInstance (
                         "extra.animation.json" -> animationData["extra"] = ResourceConstants.defaultExtraAnimationJsonContent!!.toByteArray()
                     }
                 }
-                return YsmModelFileInstance(modelName, needAuthChecker.apply(modelName), metaData, animationData, textureData)
-            } finally {
+                return WrappedYsmCacheFileInstance(ysmModelData.getModelName(),ysmModelData.getAuthChecker().apply(ysmModelData.getModelName()), metaData, animationData, textureData)
+            }finally {
                 Thread.currentThread().contextClassLoader = currentLoader
             }
         }
-    }
-
-    //Java -> Kotlin translate error
-    /*private var modelName: String? = null
-    private var needAuth = false
-    private var metaData: Map<String, ByteArray>? = null
-    private var textureData: Map<String, ByteArray>? = null
-    private var animationData: Map<String, ByteArray>? = null*/
-
-    fun setNeedAuth(needAuth: Boolean){
-        this.needAuth = needAuth
-    }
-
-    fun isNeedAuth(): Boolean{
-        return this.needAuth
     }
 
     fun getModelName(): String{
@@ -117,22 +89,22 @@ class YsmModelFileInstance (
 
     @Throws(IOException::class)
     fun toWritableBytes(
-        data: YsmModelFileInstance,
+        data: WrappedYsmCacheFileInstance,
         key: SecretKey,
         spec: AlgorithmParameterSpec
     ): ByteArray {
         val byteArrayOutputStream = ByteArrayOutputStream()
         byteArrayOutputStream.write(YsmCodecUtil.intToByteArray(1498629968))
         byteArrayOutputStream.write(YsmCodecUtil.intToByteArray(1))
-        val arrayOfByte1 = getProcessed(data, key, spec)
+        val arrayOfByte1 = getEncrypted(data, key, spec)
         val arrayOfByte2: ByteArray = MD5Utils.degist(arrayOfByte1)!!
         byteArrayOutputStream.write(arrayOfByte2)
         byteArrayOutputStream.write(arrayOfByte1)
         return byteArrayOutputStream.toByteArray()
     }
 
-    private fun getProcessed(
-        data: YsmModelFileInstance,
+    private fun getEncrypted(
+        data: WrappedYsmCacheFileInstance,
         key: SecretKey,
         spec: AlgorithmParameterSpec
     ): ByteArray {

@@ -1,5 +1,7 @@
 package me.earthme.mysm
 
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.event.PacketListenerPriority
 import me.earthme.mysm.commands.*
 import me.earthme.mysm.connection.FabricPlayerYsmConnection
 import me.earthme.mysm.connection.ForgePlayerYsmConnection
@@ -19,10 +21,8 @@ object PluginBootstrap {
         PlayerDataManager.loadAllDataFromFolder(pluginInstance)
         MainYsmNetworkHandler.init(pluginInstance)
 
-        FabricPlayerYsmConnection.registerChannels(pluginInstance)
-        ForgePlayerYsmConnection.registerChannels(pluginInstance)
-
         Bukkit.getPluginManager().registerEvents(MainYsmNetworkHandler,pluginInstance)
+        PacketEvents.getAPI().eventManager.registerListener(MainYsmNetworkHandler)
         pluginInstance.logger.info("Registed packet and event listener")
 
         pluginInstance.logger.info("Starting handler tick loop")

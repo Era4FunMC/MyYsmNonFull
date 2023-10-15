@@ -1,15 +1,16 @@
 name: MyYSM
-version: '1.0'
+version: '1.2'
 author: EarthMe
 description: "Simple plugin could make the ysm be usable on plugin servers"
 website: https://github.com/Era4FunMC/
 main: me.earthme.mysm.MyYSM
-api-version: '1.20'
+api-version: '1.16'
 
 folia-supported: true
 
 depend:
   - MCKotlin-Paper
+  - packetevents
 
 commands:
   playanimationonplayer:

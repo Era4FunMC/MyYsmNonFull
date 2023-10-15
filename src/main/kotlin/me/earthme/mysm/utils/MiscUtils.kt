@@ -1,7 +1,5 @@
 package me.earthme.mysm.utils
 
-import me.earthme.mysm.connection.FabricPlayerYsmConnection
-import me.earthme.mysm.connection.ForgePlayerYsmConnection
 import me.earthme.mysm.events.PlayerAnimationEvent
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.manager.MultiSupportedVersionCacheManager
@@ -20,24 +18,14 @@ object MiscUtils {
 
     fun dropModelForPlayer(targetPlayer: Player,targetModel: NamespacedKey){
         ModelPermissionManager.removePlayerHeldModel(targetPlayer,targetModel)
-        val connection = targetPlayer.getConnection()
-        if (connection is FabricPlayerYsmConnection){
-            connection.sendHeldModes(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer))
-        }else if (connection is ForgePlayerYsmConnection){
-            connection.sendHeldModes(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer))
-        }
+        targetPlayer.getConnection()?.sendHeldModes(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer))
         PlayerDataManager.setToDefaultIfIncorrect(targetPlayer) //Correct if the current model is removed
         PlayerDataManager.createOrGetPlayerData(targetPlayer.name).sendAnimation = true //Set send latch to true
     }
 
     fun giveModelToPlayer(targetPlayer: Player,targetModel: NamespacedKey){
         ModelPermissionManager.addPlayerHeldModel(targetPlayer,targetModel)
-        val connection = targetPlayer.getConnection()
-        if (connection is FabricPlayerYsmConnection){
-            connection.sendHeldModes(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer))
-        }else if (connection is ForgePlayerYsmConnection){
-            connection.sendHeldModes(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer))
-        }
+        targetPlayer.getConnection()?.sendHeldModes(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer))
     }
 
     fun playAnimationOnPlayer(player: Player,animation: String){

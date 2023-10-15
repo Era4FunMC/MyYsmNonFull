@@ -1,8 +1,9 @@
 package me.earthme.mysm.connection
 
-import com.viaversion.viaversion.api.Via
+import com.github.retrooper.packetevents.PacketEvents
 import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
+import me.earthme.mysm.SchedulerUtils
 import me.earthme.mysm.data.PlayerModelData
 import me.earthme.mysm.events.PlayerChangeModelEvent
 import me.earthme.mysm.manager.ModelPermissionManager
@@ -12,7 +13,7 @@ import me.earthme.mysm.network.MainYsmNetworkHandler
 import me.earthme.mysm.network.MainYsmNetworkHandler.getConnection
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.utils.network.YsmPacketHelper
-import me.earthme.mysm.utils.nms.MCPacketCodecUtils
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import me.earthme.mysm.utils.ysm.EncryptUtils
 import me.earthme.mysm.utils.ysm.MiscUtils
 import org.bukkit.Bukkit
@@ -24,27 +25,19 @@ class ForgePlayerYsmConnection(
     private val player: Player,
     private val pluginInstance: Plugin
 ): PlayerYsmConnection {
-
     companion object {
         private val CHANNEL = NamespacedKey("yes_steve_model", "network")
-
-        fun registerChannels(pluginInstance: Plugin){
-            Bukkit.getServer().messenger.registerIncomingPluginChannel(pluginInstance,CHANNEL.toString(),MainYsmNetworkHandler.PluginMessageListenerYSM())
-            Bukkit.getServer().messenger.registerOutgoingPluginChannel(pluginInstance,CHANNEL.toString())
-        }
     }
+
+    override fun isChannelNameMatched(channel: String): Boolean {
+        return CHANNEL.toString() == channel
+    }
+
     override fun tick() {
         val playerData = PlayerDataManager.createOrGetPlayerData(this.player.name)
         if (playerData.sendAnimation){
             for (singlePlayer in Bukkit.getOnlinePlayers()){
-                val otherConnection =  singlePlayer.getConnection()
-                if (otherConnection is FabricPlayerYsmConnection){
-                    otherConnection.sendModelUpdate(this.player)
-                }
-
-                if (otherConnection is ForgePlayerYsmConnection){
-                    otherConnection.sendModelUpdate(this.player)
-                }
+                singlePlayer.getConnection()?.sendModelUpdate(this.player)
             }
             playerData.sendAnimation = false
         }
@@ -76,11 +69,11 @@ class ForgePlayerYsmConnection(
 
     override fun onMessageIncoming(key: NamespacedKey, packetData: ByteArray) {
         val byteBuf = Unpooled.copiedBuffer(packetData)
-        this.processInternal(byteBuf.readByte(),byteBuf)
+        SchedulerUtils.schedulerAsExecutor(this.player.location).execute { this.processInternal(byteBuf.readByte(),byteBuf) }
     }
 
     private fun processInternal(id: Byte,byteBuf: ByteBuf){
-        val playerProtocolVersion = Via.getAPI().getPlayerVersion(this.player)
+        val playerProtocolVersion = PacketEvents.getAPI().playerManager.getClientVersion(this.player).protocolVersion
         when(id.toInt()){
             5 -> {
                 //TODO Limit the packet speed?
@@ -97,14 +90,7 @@ class ForgePlayerYsmConnection(
                     targetData.isDirty = true
 
                     for (singlePlayer in Bukkit.getOnlinePlayers()){
-                        val otherConnection =  singlePlayer.getConnection()
-                        if (otherConnection is FabricPlayerYsmConnection){
-                            otherConnection.sendModelUpdate(this.player)
-                        }
-
-                        if (otherConnection is ForgePlayerYsmConnection){
-                            otherConnection.sendModelUpdate(this.player)
-                        }
+                        singlePlayer.getConnection()?.sendModelUpdate(this.player)
                     }
 
                     this.pluginInstance.logger.info("Player ${this.player.name} has changed model to $targetModelResourceLocation")
@@ -159,7 +145,7 @@ class ForgePlayerYsmConnection(
     }
 
 
-    fun sendHeldModes(models: Set<NamespacedKey>){
+    override fun sendHeldModes(models: Set<NamespacedKey>){
         val dataBufPre = Unpooled.buffer()
         dataBufPre.writeByte(6 and 255)
 
@@ -168,7 +154,7 @@ class ForgePlayerYsmConnection(
         this.sendPacket(dataBuf,CHANNEL)
     }
 
-    fun sendReload(){
+    override fun sendReload(){
         val dataBufPre = Unpooled.buffer()
         dataBufPre.writeByte(2 and 255)
 
@@ -177,16 +163,16 @@ class ForgePlayerYsmConnection(
         this.sendPacket(dataBuf,CHANNEL)
     }
 
-    fun sendModelUpdate(ownerEntity: Player){
+    override fun sendModelUpdate(ownerEntity: Player){
         val dataBufPre = Unpooled.buffer()
         dataBufPre.writeByte(4 and 255)
 
-        val dataBuf = YsmPacketHelper.modelUpdatePacketData(dataBufPre,ownerEntity)
+        val dataBuf = YsmPacketHelper.modelUpdatePacketDataForge(dataBufPre,ownerEntity)
 
         this.sendPacket(dataBuf,CHANNEL)
     }
 
-    fun sendMd5Contained(containedMd5: String){
+    override fun sendMd5Contained(containedMd5: String){
         val dataBufPre = Unpooled.buffer()
         dataBufPre.writeByte(3 and 255)
 
@@ -195,7 +181,7 @@ class ForgePlayerYsmConnection(
         this.sendPacket(dataBuffer,CHANNEL)
     }
 
-    fun sendModelOrPasswordData(data: ByteArray){
+    override fun sendModelOrPasswordData(data: ByteArray){
         val dataBufPre = Unpooled.buffer()
         dataBufPre.writeByte(1 and 255)
 

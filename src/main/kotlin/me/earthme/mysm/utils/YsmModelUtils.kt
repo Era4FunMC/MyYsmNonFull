@@ -1,7 +1,8 @@
 package me.earthme.mysm.utils
 
 import com.alibaba.fastjson.JSONObject
-import me.earthme.mysm.data.YsmModelFileInstance
+import me.earthme.mysm.data.WrappedYsmCacheFileInstance
+import me.earthme.mysm.data.YsmModelData
 import me.earthme.mysm.utils.model.ModelAnimationMetaFileType
 
 object YsmModelUtils {
@@ -26,21 +27,21 @@ object YsmModelUtils {
         return false
     }
 
-    fun getAnimationListFromModel(modelInstance: YsmModelFileInstance): List<String>{
-        val animationDataMap = modelInstance.animationData!!
+    fun getAnimationListFromModel(modelInstance: YsmModelData): List<String>{
+        val allFiles = modelInstance.getAllFiles()
         val ret: MutableList<String> = ArrayList()
 
-        for (singleContentData in animationDataMap.values){
+        for (singleContentData in allFiles.values){
             ret.addAll(getAnimationListFromAnimationJson(String(singleContentData)))
         }
 
         return ret
     }
 
-    fun getAnimationListFromModel(modelInstance: YsmModelFileInstance,modelAnimationMetaFileType: ModelAnimationMetaFileType): List<String>{
-        val animationDataMap = modelInstance.animationData!!
+    fun getAnimationListFromModel(modelInstance: YsmModelData, modelAnimationMetaFileType: ModelAnimationMetaFileType): List<String>{
+        val allFiles = modelInstance.getAllFiles()
         val ret: MutableList<String> = ArrayList()
-        val contentData = animationDataMap[modelAnimationMetaFileType.getFileName()]
+        val contentData = allFiles[modelAnimationMetaFileType.getFileName()]
 
         if (contentData != null){
             ret.addAll(getAnimationListFromAnimationJson(String(contentData)))
