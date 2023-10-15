@@ -132,7 +132,7 @@ object MultiSupportedVersionCacheManager {
             passwordFileInstance.algorithmParameterSpec)
         val fileName = MD5Utils.getMd5(cacheData)
         val targetFolder = File(baseCacheDir,"version_${version.version}_${version.modLoader}")
-        targetFolder.mkdir()
+        targetFolder.mkdirs()
         val targetCacheFile = File(targetFolder,fileName)
         Files.write(targetCacheFile.toPath(),cacheData)
 
