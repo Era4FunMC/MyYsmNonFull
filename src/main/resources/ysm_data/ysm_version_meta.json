@@ -35,6 +35,18 @@
       "dataClassName": "com.elfmcys.yesstevemodel.oO0OoOoO0OOo0ooo00Ooo0oo",
       "version": 758,
       "modLoader": "forge"
+    },
+    {
+      "downloadLink": "https://mediafilez.forgecdn.net/files/4702/497/yesstevemodel-1.16.5-fabric-release-1.1.5-hotfix-2.jar",
+      "dataClassName": "com.elfmcys.yesstevemodel.OoO0Oo0OO00O0oo0o000o0oO",
+      "version": 754,
+      "modLoader": "fabric"
+    },
+    {
+      "downloadLink": "https://mediafilez.forgecdn.net/files/4688/191/yesstevemodel-1.16.5-release-1.1.5-hotfix-3.jar",
+      "dataClassName": "com.elfmcys.yesstevemodel.oO0OoOoO0OOo0ooo00Ooo0oo",
+      "version": 754,
+      "modLoader": "forge"
     }
   ]
 }
