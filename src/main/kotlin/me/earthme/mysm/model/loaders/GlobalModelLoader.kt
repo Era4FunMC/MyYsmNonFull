@@ -3,7 +3,7 @@ package me.earthme.mysm.model.loaders
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.model.IModelLoader
 import me.earthme.mysm.model.YsmModelData
-import me.earthme.mysm.model.loaders.impl.FolderYsmModelLoader
+import me.earthme.mysm.model.loaders.impl.FolderYsmModelLoaderImpl
 import me.earthme.mysm.model.loaders.impl.ZipFileYsmLoaderImpl
 import me.earthme.mysm.utils.AsyncExecutor
 import org.bukkit.NamespacedKey
@@ -34,7 +34,7 @@ object GlobalModelLoader {
     }
 
     private fun addDefaultLoaders(){
-        this.allLoaderImpls.add(FolderYsmModelLoader())
+        this.allLoaderImpls.add(FolderYsmModelLoaderImpl())
         this.allLoaderImpls.add(ZipFileYsmLoaderImpl())
     }
 

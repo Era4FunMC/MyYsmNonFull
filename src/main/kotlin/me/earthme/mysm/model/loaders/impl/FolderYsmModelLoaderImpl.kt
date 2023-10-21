@@ -8,7 +8,7 @@ import java.io.File
 import java.nio.file.Files
 import java.util.function.Function
 
-class FolderYsmModelLoader: IModelLoader {
+class FolderYsmModelLoaderImpl: IModelLoader {
     override fun canLoad(modelFile: File): Boolean {
         return modelFile.isDirectory
     }
