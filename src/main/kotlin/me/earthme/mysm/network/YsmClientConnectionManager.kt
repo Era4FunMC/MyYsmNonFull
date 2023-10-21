@@ -11,7 +11,6 @@ import me.earthme.mysm.network.connection.FabricPlayerYsmConnection
 import me.earthme.mysm.network.connection.ForgePlayerYsmConnection
 import me.earthme.mysm.network.connection.PlayerYsmConnection
 import me.earthme.mysm.utils.AsyncExecutor
-import me.earthme.mysm.utils.network.YsmPacketHelper
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey

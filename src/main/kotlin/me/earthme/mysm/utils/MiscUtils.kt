@@ -12,7 +12,7 @@ import org.bukkit.entity.Player
 
 object MiscUtils {
     fun reloadAllModels(){
-        VersionedCacheLoader.reload()
+        VersionedCacheLoader.reloadCaches()
         GlobalModelLoader.reloadAll()
     }
 

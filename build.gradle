@@ -4,8 +4,8 @@ plugins {
 }
 
 group = 'gg.earthme.mysm'
-version = '1.2-Aplaha'
-archivesBaseName = 'MyYsm-shadowed'
+version = '1.3-Aplaha'
+archivesBaseName = 'MyYsm'
 
 repositories {
     mavenCentral()
@@ -47,6 +47,13 @@ sourceSets {
         }
     }
 }
+
+shadowJar {
+    archiveBaseName.set(archivesBaseName + "-shadowed")
+    archiveVersion.set(version)
+    mergeServiceFiles()
+}
+
 
 compileKotlin {
     kotlinOptions.jvmTarget = '17'

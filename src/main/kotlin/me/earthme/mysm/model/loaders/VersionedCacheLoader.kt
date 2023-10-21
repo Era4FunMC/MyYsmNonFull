@@ -35,13 +35,12 @@ object VersionedCacheLoader {
     private var pluginInstance: Plugin? = null
     private var metaArray: YsmVersionMetaArray? = null
 
-    fun reload(){
-        dropAllCaches()
-        dropAll()
+    fun reloadCaches(){
+        this.deleteAllCacheFiles()
+        this.dropAllLoadedCaches()
     }
 
-    private fun dropAll(){
-        this.loadCacheClassLoaders.clear()
+    private fun dropAllLoadedCaches(){
         synchronized(this.modelToVersion2Caches){
             this.modelToVersion2Caches.clear()
         }
@@ -100,30 +99,6 @@ object VersionedCacheLoader {
             }
         }
     }
-
-    /*private fun writeAllModelsToCache(){
-        if (loadedYsmModels.isEmpty()){
-            return
-        }
-
-        CompletableFuture.allOf(
-            *loadedYsmModels.keys.stream()
-                .map { name -> CompletableFuture.runAsync({
-                    try {
-                        for (singleVersionMeta in versionMetaMap){
-                            writeToCache(name,singleVersionMeta)
-                        }
-                    }catch (e: Exception){
-                        pluginInstance!!.logger.log(Level.SEVERE,"Error while loading model ${name}!",e)
-                    }
-                }, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE) }
-                .toArray { i -> arrayOfNulls(i) }
-        ).join()
-
-        synchronized(modelToVersion2Caches) {
-            pluginInstance!!.logger.info("Loaded ${modelToVersion2Caches.size} caches!")
-        }
-    }*/
 
     fun writeCacheForModel(modelData: YsmModelData){
         for (singleVersionMeta in versionMetaMap){
@@ -207,38 +182,7 @@ object VersionedCacheLoader {
         }
     }
 
-    /*private fun loadAllModels(){
-        modelDir.listFiles()?.let{
-            CompletableFuture.allOf(
-                *Arrays.stream(it)
-                    .map { file -> CompletableFuture.runAsync({
-                        try {
-                            val fileName = file.name
-                            val authChecker: Function<String,Boolean> = Function { return@Function needModelAuth(fileName) }
-
-                            if (file.isDirectory){
-                                pluginInstance!!.logger.info("Loading model $fileName as a directory")
-                                val files = Arrays.stream(file.listFiles()!!).collect(Collectors.toList())
-                                val ysmModelData = YsmModelData.createFromFolder(files,fileName,authChecker)
-                                loadedYsmModels[ysmModelData.getModelName()] = ysmModelData
-                            }else{
-                                /*this.pluginInstance!!.logger.info("Loading model $fileName as a file")
-                                if (fileName.endsWith(".ysm")){
-                                    val ysmModelData = YsmModelData.createFromYsmFile(file,authChecker)
-                                    this.loadedYsmModelData[ysmModelData.getModelName()] = ysmModelData
-                                }*/
-                            }
-                        }catch (e: Exception){
-                            pluginInstance!!.logger.log(Level.SEVERE,"Error while loading model ${file.name}!",e)
-                        }
-                    }, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE) }
-                    .toArray { i -> arrayOfNulls(i) }
-            ).join()
-            pluginInstance!!.logger.info("Loaded ${loadedYsmModels.size} model data!")
-        }
-    }*/
-
-    private fun dropAllCaches(){
+    private fun deleteAllCacheFiles(){
         FileUtils.forEachFolder(this.baseCacheDir){
             try {
                 if (!it.isDirectory){
@@ -272,7 +216,7 @@ object VersionedCacheLoader {
 
         this.initVars()
         this.loadPasswordFile()
-        this.dropAllCaches()
+        this.deleteAllCacheFiles()
         this.loadVersionMeta()
         this.downloadModJars()
     }

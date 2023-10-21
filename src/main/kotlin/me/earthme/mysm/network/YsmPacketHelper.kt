@@ -1,4 +1,4 @@
-package me.earthme.mysm.utils.network
+package me.earthme.mysm.network
 
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage

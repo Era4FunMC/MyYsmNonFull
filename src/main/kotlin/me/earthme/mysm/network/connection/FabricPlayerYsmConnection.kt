@@ -12,7 +12,7 @@ import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.network.YsmClientConnectionManager
 import me.earthme.mysm.network.YsmClientConnectionManager.getConnection
 import me.earthme.mysm.utils.AsyncExecutor
-import me.earthme.mysm.utils.network.YsmPacketHelper
+import me.earthme.mysm.network.YsmPacketHelper
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import me.earthme.mysm.utils.ysm.EncryptUtils
 import me.earthme.mysm.utils.ysm.MiscUtils
