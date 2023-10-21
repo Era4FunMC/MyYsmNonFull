@@ -17,6 +17,15 @@ You need to run the following command to build a jar
 ```
 
 ## Dependencies
- 
  - [PacketEvents](https://github.com/retrooper/packetevents)
  - [MCKotlin(<1.3)](https://hangar.papermc.io/4drian3d/MCKotlin)
+
+## Supported ysm versions
+ - 1.20.1(forge,fabric)
+ - 1.19.2(forge,fabric)
+ - 1.18.2(forge,fabric)
+ - 1.16.5(forge,fabric)
+
+## Supported model file format
+ - Folders
+ - Zip files
