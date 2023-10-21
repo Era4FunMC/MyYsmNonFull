@@ -1,4 +1,4 @@
-package me.earthme.mysm
+package me.earthme.mysm.utils.ysm
 
 import com.github.retrooper.packetevents.protocol.nbt.NBTByte
 import com.github.retrooper.packetevents.protocol.nbt.NBTCompound

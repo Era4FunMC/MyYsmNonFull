@@ -6,10 +6,10 @@ import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage
 import io.netty.buffer.Unpooled
-import me.earthme.mysm.SchedulerUtils
-import me.earthme.mysm.connection.FabricPlayerYsmConnection
-import me.earthme.mysm.connection.ForgePlayerYsmConnection
-import me.earthme.mysm.connection.PlayerYsmConnection
+import me.earthme.mysm.utils.SchedulerUtils
+import me.earthme.mysm.network.connection.FabricPlayerYsmConnection
+import me.earthme.mysm.network.connection.ForgePlayerYsmConnection
+import me.earthme.mysm.network.connection.PlayerYsmConnection
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.utils.network.YsmPacketHelper
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.LockSupport
 
 
-object MainYsmNetworkHandler : Listener, SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
-    private val tickExecutor: Executor = CompletableFuture.delayedExecutor(50,TimeUnit.MILLISECONDS, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE)
+object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(PacketListenerPriority.HIGH) {
+    private val tickScheduler: Executor = CompletableFuture.delayedExecutor(50,TimeUnit.MILLISECONDS, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE)
 
     private val shouldTickNext: AtomicBoolean = AtomicBoolean(true)
     private val hasScheduledTask: AtomicBoolean = AtomicBoolean(false)
@@ -36,7 +36,7 @@ object MainYsmNetworkHandler : Listener, SimplePacketListenerAbstract(PacketList
 
     val modInstalledPlayerList: MutableList<Player> = CopyOnWriteArrayList()
     private val visibleMap: MutableMap<Player,MutableSet<Player>> = ConcurrentHashMap()
-    private val connectionMap: MutableMap<Player,PlayerYsmConnection> = ConcurrentHashMap()
+    private val connectionMap: MutableMap<Player, PlayerYsmConnection> = ConcurrentHashMap()
     private var pluginInstance: Plugin? = null
 
     fun init(plugin: Plugin){
@@ -56,13 +56,13 @@ object MainYsmNetworkHandler : Listener, SimplePacketListenerAbstract(PacketList
             return
         }
 
-        tickExecutor.execute {
+        tickScheduler.execute {
             try {
                 hasScheduledTask.set(false)
                 this.doTick()
             }finally {
                 //Schedule the next tick
-                tickExecutor.execute{
+                tickScheduler.execute{
                     hasScheduledTask.set(true)
                     this.tickThenSchedule()
                 }
@@ -101,7 +101,6 @@ object MainYsmNetworkHandler : Listener, SimplePacketListenerAbstract(PacketList
         YsmPacketHelper.attachChannelForPlayer(playerJoinEvent.player)
     }
 
-    //TODO Optimize
     @EventHandler
     fun onPlayerMove(playerMoveEvent: PlayerMoveEvent) {
         val player = playerMoveEvent.player
@@ -112,7 +111,7 @@ object MainYsmNetworkHandler : Listener, SimplePacketListenerAbstract(PacketList
         for (singlePlayer: Player in Bukkit.getOnlinePlayers()) {
             if (!this.visibleMap.containsKey(player)) {
                 this.visibleMap[player] = HashSet()
-                this.visibleMap[player]!!.add(player) //The player can always see itself
+                this.visibleMap[player]!!.add(player)
             }
 
             if (player.canSee(singlePlayer) && !this.visibleMap[player]!!.contains(singlePlayer)) {
@@ -136,10 +135,10 @@ object MainYsmNetworkHandler : Listener, SimplePacketListenerAbstract(PacketList
 
         playerQuitEvent.player.getConnection()?.onPlayerLeft(playerQuitEvent.player)
         this.connectionMap.remove(playerQuitEvent.player)
+        this.visibleMap.remove(playerQuitEvent.player)
     }
 
     fun sendReloadToAllPlayers(){
-        //Broadcast to all
         for (player in Bukkit.getOnlinePlayers()){
             player.getConnection()?.sendReload()
         }

@@ -1,4 +1,4 @@
-package me.earthme.mysm.data
+package me.earthme.mysm.data.mod
 
 import com.google.gson.Gson
 
@@ -8,8 +8,8 @@ data class YsmVersionMetaArray (
     companion object{
         private val gson: Gson = Gson()
 
-        fun readFromJson(data: String): YsmVersionMetaArray{
-            return gson.fromJson(data,YsmVersionMetaArray::class.java)
+        fun readFromJson(data: String): YsmVersionMetaArray {
+            return gson.fromJson(data, YsmVersionMetaArray::class.java)
         }
     }
 

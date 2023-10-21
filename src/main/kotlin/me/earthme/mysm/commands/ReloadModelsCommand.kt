@@ -1,8 +1,8 @@
 package me.earthme.mysm.commands
 
-import me.earthme.mysm.manager.MultiSupportedVersionCacheManager
 import me.earthme.mysm.manager.PlayerDataManager
-import me.earthme.mysm.network.MainYsmNetworkHandler
+import me.earthme.mysm.network.YsmClientConnectionManager
+import me.earthme.mysm.utils.MiscUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
@@ -16,11 +16,11 @@ class ReloadModelsCommand : CommandExecutor {
             return true
         }
 
-        MultiSupportedVersionCacheManager.reload()
+        MiscUtils.reloadAllModels()
         for (player in Bukkit.getOnlinePlayers()){
             PlayerDataManager.setToDefaultIfIncorrect(player)
         }
-        MainYsmNetworkHandler.sendReloadToAllPlayers()
+        YsmClientConnectionManager.sendReloadToAllPlayers()
         sender.sendMessage(ChatColor.GREEN.toString() + "Successfully reload all models!")
         return true
     }

@@ -26,7 +26,7 @@ class MyYSM : JavaPlugin() {
             return@Callable isFolia.toString()
         }))
         this.loadConfigValues()
-        PluginBootstrap.initAllManager(this)
+        PluginBootstrap.initAll(this)
     }
 
     private fun loadConfigValues(){

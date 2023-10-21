@@ -1,8 +1,7 @@
 package me.earthme.mysm.utils
 
 import com.alibaba.fastjson.JSONObject
-import me.earthme.mysm.data.WrappedYsmCacheFileInstance
-import me.earthme.mysm.data.YsmModelData
+import me.earthme.mysm.model.YsmModelData
 import me.earthme.mysm.utils.model.ModelAnimationMetaFileType
 
 object YsmModelUtils {

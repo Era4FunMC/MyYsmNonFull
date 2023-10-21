@@ -1,32 +1,31 @@
 package me.earthme.mysm
 
 import com.github.retrooper.packetevents.PacketEvents
-import com.github.retrooper.packetevents.event.PacketListenerPriority
 import me.earthme.mysm.commands.*
-import me.earthme.mysm.connection.FabricPlayerYsmConnection
-import me.earthme.mysm.connection.ForgePlayerYsmConnection
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.manager.ModelPermissionManager
-import me.earthme.mysm.manager.MultiSupportedVersionCacheManager
-import me.earthme.mysm.network.MainYsmNetworkHandler
+import me.earthme.mysm.model.loaders.GlobalModelLoader
+import me.earthme.mysm.model.loaders.VersionedCacheLoader
+import me.earthme.mysm.network.YsmClientConnectionManager
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 
 object PluginBootstrap {
 
-    fun initAllManager(pluginInstance: Plugin){
+    fun initAll(pluginInstance: Plugin){
         ResourceConstants.initAll(pluginInstance)
         ModelPermissionManager.loadOrInitFromFile(pluginInstance)
-        MultiSupportedVersionCacheManager.init(pluginInstance)
+        VersionedCacheLoader.init(pluginInstance)
+        GlobalModelLoader.init(pluginInstance)
         PlayerDataManager.loadAllDataFromFolder(pluginInstance)
-        MainYsmNetworkHandler.init(pluginInstance)
+        YsmClientConnectionManager.init(pluginInstance)
 
-        Bukkit.getPluginManager().registerEvents(MainYsmNetworkHandler,pluginInstance)
-        PacketEvents.getAPI().eventManager.registerListener(MainYsmNetworkHandler)
+        Bukkit.getPluginManager().registerEvents(YsmClientConnectionManager,pluginInstance)
+        PacketEvents.getAPI().eventManager.registerListener(YsmClientConnectionManager)
         pluginInstance.logger.info("Registed packet and event listener")
 
         pluginInstance.logger.info("Starting handler tick loop")
-        MainYsmNetworkHandler.tickThenSchedule() //Tick once to start the tickloop
+        YsmClientConnectionManager.tickThenSchedule() //Tick once to start the tickloop
 
         pluginInstance.logger.info("Registering commands")
         Bukkit.getPluginCommand("gmodeltp")!!.setExecutor(GiveModelPlayerCommand())
@@ -43,6 +42,6 @@ object PluginBootstrap {
         PlayerDataManager.saveAllData()
         ModelPermissionManager.close()
         pluginInstance.logger.info("Terminating packet handler")
-        MainYsmNetworkHandler.awaitShutdown()
+        YsmClientConnectionManager.awaitShutdown()
     }
 }

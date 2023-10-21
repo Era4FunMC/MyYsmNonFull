@@ -1,4 +1,4 @@
-package me.earthme.mysm.data
+package me.earthme.mysm.model.cache
 
 import it.unimi.dsi.fastutil.bytes.ByteArrays
 import me.earthme.mysm.utils.ysm.EncryptUtils
@@ -10,7 +10,7 @@ import java.nio.file.Files
 import javax.crypto.SecretKey
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
-class YsmPasswordFileInstance(val secretKey: SecretKey, val algorithmParameterSpec: IvParameterSpec, data: ByteArray?) {
+class CacheAESKeyFile(val secretKey: SecretKey, val algorithmParameterSpec: IvParameterSpec, data: ByteArray?) {
     fun encodeToByte(): ByteArray {
         return try {
             val byteArrayOutputStream = ByteArrayOutputStream()
@@ -33,10 +33,10 @@ class YsmPasswordFileInstance(val secretKey: SecretKey, val algorithmParameterSp
 
     companion object {
         @get:Contract(" -> new")
-        val random: YsmPasswordFileInstance
-            get() = YsmPasswordFileInstance(EncryptUtils.generateSecretKey(), EncryptUtils.generateIV(), null)
+        val random: CacheAESKeyFile
+            get() = CacheAESKeyFile(EncryptUtils.generateSecretKey(), EncryptUtils.generateIV(), null)
 
-        fun readFromFile(target: File): YsmPasswordFileInstance? {
+        fun readFromFile(target: File): CacheAESKeyFile? {
             val allData = Files.readAllBytes(target.toPath())
             val i: Int = YsmCodecUtil.byteToIntArray(allData, 0)
             val j: Int = YsmCodecUtil.byteToIntArray(allData, 4)
@@ -48,7 +48,7 @@ class YsmPasswordFileInstance(val secretKey: SecretKey, val algorithmParameterSp
             }
             val keyData = ByteArrays.copy(allData, 8, 16)
             val ivData = ByteArrays.copy(allData, 24, 16)
-            return YsmPasswordFileInstance(SecretKeySpec(keyData, "AES"), IvParameterSpec(ivData), allData)
+            return CacheAESKeyFile(SecretKeySpec(keyData, "AES"), IvParameterSpec(ivData), allData)
         }
     }
 }

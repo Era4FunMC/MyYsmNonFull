@@ -3,7 +3,7 @@ package me.earthme.mysm.utils.network
 import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage
 import io.netty.buffer.ByteBuf
-import me.earthme.mysm.YsmNbtUtils
+import me.earthme.mysm.utils.ysm.YsmNbtUtils
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import org.bukkit.NamespacedKey

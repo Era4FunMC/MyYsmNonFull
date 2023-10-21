@@ -1,4 +1,4 @@
-package me.earthme.mysm.data
+package me.earthme.mysm.data.mod
 
 data class YsmVersionMeta (
     val downloadLink: String,

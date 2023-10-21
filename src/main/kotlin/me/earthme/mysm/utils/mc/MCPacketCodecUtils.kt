@@ -47,20 +47,6 @@ object MCPacketCodecUtils {
         return value
     }
 
-    fun readVarLong(byteBuf: ByteBuf): Long {
-        var value: Long = 0
-        var position = 0
-        var currentByte: Byte
-        while (true) {
-            currentByte = byteBuf.readByte()
-            value = value or ((currentByte.toInt() and SEGMENT_BITS).toLong() shl position)
-            if (currentByte.toInt() and CONTINUE_BIT == 0) break
-            position += 7
-            if (position >= 64) throw java.lang.RuntimeException("VarLong is too big")
-        }
-        return value
-    }
-
     fun writeVarInt(value: Int,byteBuf: ByteBuf) {
         var value = value
         while (true) {
@@ -69,20 +55,6 @@ object MCPacketCodecUtils {
                 return
             }
             byteBuf.writeByte(value and SEGMENT_BITS or CONTINUE_BIT)
-
-            // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
-            value = value ushr 7
-        }
-    }
-
-    fun writeVarLong(value: Long,byteBuf: ByteBuf) {
-        var value = value
-        while (true) {
-            if (value and SEGMENT_BITS.toLong().inv() == 0L) {
-                byteBuf.writeByte(value.toInt())
-                return
-            }
-            byteBuf.writeByte((value and SEGMENT_BITS.toLong() or CONTINUE_BIT.toLong()).toInt())
 
             // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
             value = value ushr 7

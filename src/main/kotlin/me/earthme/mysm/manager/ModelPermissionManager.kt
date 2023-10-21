@@ -1,7 +1,6 @@
 package me.earthme.mysm.manager
 
 import me.earthme.mysm.data.ModelPermissionData
-import me.earthme.mysm.network.MainYsmNetworkHandler
 import me.earthme.mysm.utils.AsyncExecutor
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player

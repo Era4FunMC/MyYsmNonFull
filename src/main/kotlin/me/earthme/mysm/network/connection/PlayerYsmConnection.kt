@@ -1,4 +1,4 @@
-package me.earthme.mysm.connection
+package me.earthme.mysm.network.connection
 
 import io.netty.buffer.ByteBuf
 import org.bukkit.NamespacedKey

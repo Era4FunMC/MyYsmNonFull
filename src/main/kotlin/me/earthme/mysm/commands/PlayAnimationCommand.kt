@@ -1,7 +1,9 @@
 package me.earthme.mysm.commands
 
 import me.earthme.mysm.manager.PlayerDataManager
+import me.earthme.mysm.model.loaders.GlobalModelLoader
 import me.earthme.mysm.utils.MiscUtils
+import me.earthme.mysm.utils.YsmModelUtils
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.Command
@@ -27,21 +29,20 @@ class PlayAnimationCommand: CommandExecutor {
             }
 
             val currentPlayerData = PlayerDataManager.createOrGetPlayerData(targetPlayer.name)
-            //TODO Complete it
-            //val currentModel = ModelLoader.getModel(currentPlayerData.mainResourceLocation)!!
-            //val allAnimations = YsmModelUtils.getAnimationListFromModel(currentModel)
 
-            /*if (!allAnimations.contains(targetAnimationName)){
+            val currentModel = GlobalModelLoader.getTargetModelData(currentPlayerData.mainResourceLocation.key)!!
+            val allAnimations = YsmModelUtils.getAnimationListFromModel(currentModel)
+
+            if (!allAnimations.contains(targetAnimationName)){
                 sender.sendMessage(ChatColor.RED.toString() + "Target animation not found!")
                 val modelListMsg = StringBuffer()
-                modelListMsg
-                    .append("All models of this model:").append("\n")
+                modelListMsg.append("All models of this model:").append("\n")
                 for (modelStr in allAnimations){
                     modelListMsg.append(modelStr).append("\n")
                 }
                 sender.sendMessage(modelListMsg.toString())
                 return true
-            }*/
+            }
 
             MiscUtils.playAnimationOnPlayer(targetPlayer,targetAnimationName)
             return true

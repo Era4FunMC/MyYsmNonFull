@@ -1,5 +1,6 @@
-package me.earthme.mysm
+package me.earthme.mysm.utils
 
+import me.earthme.mysm.MyYSM
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.plugin.Plugin
@@ -19,7 +20,7 @@ object SchedulerUtils {
                 val executeMethod = regionSchedulerClass.getDeclaredMethod("execute",
                     Plugin::class.java,Location::class.java,Runnable::class.java)
                 executeMethod.isAccessible = true
-                executeMethod.invoke(regionScheduler,MyYSM.instance,location!!,task)
+                executeMethod.invoke(regionScheduler, MyYSM.instance,location!!,task)
             }
         }
     }
