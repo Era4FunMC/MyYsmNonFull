@@ -15,7 +15,7 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 
-object EncryptUtils {
+object AESEncryptUtils {
     @Throws(Exception::class)
     fun encryptDataWithKnownKey(paramArrayOfbyte1: ByteArray?, paramArrayOfbyte2: ByteArray?): ByteArray {
         val secretKeySpec = SecretKeySpec(paramArrayOfbyte1, "AES")

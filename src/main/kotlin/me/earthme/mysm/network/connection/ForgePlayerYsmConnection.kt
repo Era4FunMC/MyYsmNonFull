@@ -14,7 +14,7 @@ import me.earthme.mysm.network.YsmClientConnectionManager.getConnection
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.network.YsmPacketHelper
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
-import me.earthme.mysm.utils.ysm.EncryptUtils
+import me.earthme.mysm.utils.ysm.AESEncryptUtils
 import me.earthme.mysm.utils.ysm.MiscUtils
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -123,7 +123,7 @@ class ForgePlayerYsmConnection(
                     }, VersionedCacheLoader.getVersionMeta("forge",playerProtocolVersion)!!)
 
                     val passwordData = VersionedCacheLoader.getPasswordData()
-                    val processedPasswordData = EncryptUtils.encryptDataWithKnownKey(MiscUtils.uuidToByte(this.player.uniqueId),passwordData) //Encrypt logic in ysm
+                    val processedPasswordData = AESEncryptUtils.encryptDataWithKnownKey(MiscUtils.uuidToByte(this.player.uniqueId),passwordData) //Encrypt logic in ysm
                     this.pluginInstance.logger.info("Password data length:" + processedPasswordData.size) //Debug //TODO Remove this
                     this.sendModelOrPasswordData(processedPasswordData) //Send password data
                 }

@@ -119,6 +119,6 @@ class WrappedCacheData (
         YsmCodecUtil.writeBytes(outputStream, data.textureData)
         YsmCodecUtil.writeBytes(outputStream, data.animationData)
         val compressedBytes: ByteArray = CompressUtil.compress(outputStream.toByteArray())!!
-        return EncryptUtils.encrypt(key, spec, compressedBytes).toByteArray()
+        return AESEncryptUtils.encrypt(key, spec, compressedBytes).toByteArray()
     }
 }

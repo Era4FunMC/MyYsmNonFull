@@ -22,10 +22,11 @@ object CompressUtil {
         return outputStream.toByteArray()
     }
 
-    fun decompress(compressedData: ByteArray): ByteArray? {
+    fun decompress(compressedData: ByteArray): ByteArray {
         if (compressedData.isEmpty()) {
             return ByteArray(0)
         }
+
         val outputStream = ByteArrayOutputStream()
         val buffer = ByteArray(1024)
         val inflater = Inflater()

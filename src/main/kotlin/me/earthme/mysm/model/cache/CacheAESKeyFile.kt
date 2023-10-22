@@ -1,7 +1,7 @@
 package me.earthme.mysm.model.cache
 
 import it.unimi.dsi.fastutil.bytes.ByteArrays
-import me.earthme.mysm.utils.ysm.EncryptUtils
+import me.earthme.mysm.utils.ysm.AESEncryptUtils
 import me.earthme.mysm.utils.ysm.YsmCodecUtil
 import org.jetbrains.annotations.Contract
 import java.io.ByteArrayOutputStream
@@ -34,7 +34,7 @@ class CacheAESKeyFile(val secretKey: SecretKey, val algorithmParameterSpec: IvPa
     companion object {
         @get:Contract(" -> new")
         val random: CacheAESKeyFile
-            get() = CacheAESKeyFile(EncryptUtils.generateSecretKey(), EncryptUtils.generateIV(), null)
+            get() = CacheAESKeyFile(AESEncryptUtils.generateSecretKey(), AESEncryptUtils.generateIV(), null)
 
         fun readFromFile(target: File): CacheAESKeyFile? {
             val allData = Files.readAllBytes(target.toPath())
