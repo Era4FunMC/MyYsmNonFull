@@ -114,7 +114,7 @@ class MyYsmModelLoaderImpl: IModelLoader{
         val fileName = String(Base64.getDecoder().decode(decryptedFileName))
 
         val md = MessageDigest.getInstance("MD5")
-        val contentByteArrayInputStream = ByteArrayInputStream(decryptedContentData)
+        val contentByteArrayInputStream = ByteArrayInputStream(encryptedFileData)
         val mdBuffer = ByteArray(2048)
         var dataLen: Int
         while (true){
