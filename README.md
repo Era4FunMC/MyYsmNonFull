@@ -22,6 +22,7 @@ You need to run the following command to build a jar
 
 ## Supported ysm versions
  - 1.20.1(forge,fabric)
+ - 1.19.4(forge)
  - 1.19.2(forge,fabric)
  - 1.18.2(forge,fabric)
  - 1.16.5(forge,fabric)

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'gg.earthme.mysm'
-version = '1.3-Aplaha'
+version = '1.4-Aplaha'
 archivesBaseName = 'MyYsm'
 
 repositories {
