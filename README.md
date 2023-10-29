@@ -29,3 +29,6 @@ You need to run the following command to build a jar
 ## Supported model file format
  - Folders
  - Zip files
+
+## BStats
+![bStats](https://bstats.org/signatures/bukkit/MyYsm.svg "bStats")
