@@ -10,8 +10,10 @@ import me.earthme.mysm.network.YsmClientConnectionManager
 import org.bukkit.Bukkit
 import org.bukkit.plugin.Plugin
 
+/**
+ * 用于初始化整个插件的类()
+ */
 object PluginBootstrap {
-
     fun initAll(pluginInstance: Plugin){
         ResourceConstants.initAll(pluginInstance)
         ModelPermissionManager.loadOrInitFromFile(pluginInstance)

@@ -11,6 +11,12 @@ object ResourceConstants {
 
     private var loadedAll = false
 
+
+    /**
+     * 调用这个方法用来初始化jar包内自带的一些ysm的默认的模型数据，一般用来加载模型的时候补全的(),
+     * 这个方法只能调用一次,如果第二次调用，它会忽略掉，因为已经加载过一次了
+     * @param pluginInstance 插件的实例
+     */
     fun initAll(pluginInstance: Plugin){
         if (loadedAll){
             pluginInstance.logger.info("All constant has loaded!Skipping")

@@ -96,11 +96,6 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
     }
 
     @EventHandler
-    fun onPlayerJoin(playerJoinEvent: PlayerJoinEvent) {
-        YsmPacketHelper.attachChannelForPlayer(playerJoinEvent.player)
-    }
-
-    @EventHandler
     fun onPlayerMove(playerMoveEvent: PlayerMoveEvent) {
         val player = playerMoveEvent.player
         this.updateTracker(player)

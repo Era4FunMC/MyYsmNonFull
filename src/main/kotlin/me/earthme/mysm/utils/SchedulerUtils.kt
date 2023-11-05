@@ -6,7 +6,15 @@ import org.bukkit.Location
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.Executor
 
+/**
+ * 这个类用于与BukkitScheduler或者FoliaRegionScheduler交互，也是实现folia和bukkit双向兼容的重要部分()
+ */
 object SchedulerUtils {
+    /**
+     * 获取一个executor包装的主线程scheduler
+     * @param location 玩家或者这个区域的位置，用于folia兼容的实现
+     * @return executor实例
+     */
     fun schedulerAsExecutor(location: Location?): Executor{
         return Executor { task ->
             if (!MyYSM.isFolia){
