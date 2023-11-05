@@ -2,6 +2,9 @@ package me.earthme.mysm.model
 
 import java.util.function.Function
 
+/**
+ * 用于存储模型数据的类
+ */
 class YsmModelData (
     private val modelName: String,
     private val authChecker: Function<String,Boolean>,

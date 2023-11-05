@@ -84,15 +84,7 @@ class ForgePlayerYsmConnection(
 
                 //Check model access
                 if ((!ModelPermissionManager.isModelNeedAuth(targetModelResourceLocation) || ModelPermissionManager.isPlayerHeldModel(this.player,targetModelResourceLocation)) && playerChangeModelEvent.callEvent()){
-                    val targetData = PlayerDataManager.createOrGetPlayerData(this.player.name)
-                    targetData.mainResourceLocation = targetModelResourceLocation
-                    targetData.mainTextPngResourceLocation = targetModelTextureResourceLocation
-                    targetData.isDirty = true
-
-                    for (singlePlayer in Bukkit.getOnlinePlayers()){
-                        singlePlayer.getConnection()?.sendModelUpdate(this.player)
-                    }
-
+                    me.earthme.mysm.utils.MiscUtils.setModelForPlayer(this.player,targetModelResourceLocation,targetModelTextureResourceLocation)
                     this.pluginInstance.logger.info("Player ${this.player.name} has changed model to $targetModelResourceLocation")
                 }else{
                     this.pluginInstance.logger.info("Player ${this.player.name} has tried to use a un-authed model")

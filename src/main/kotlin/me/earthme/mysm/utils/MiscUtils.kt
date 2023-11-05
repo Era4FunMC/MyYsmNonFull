@@ -7,6 +7,7 @@ import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.model.loaders.GlobalModelLoader
 import me.earthme.mysm.network.YsmClientConnectionManager
 import me.earthme.mysm.network.YsmClientConnectionManager.getConnection
+import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 
@@ -78,5 +79,45 @@ object MiscUtils {
         playerData.currentAnimation = animation
         playerData.doAnimation = true
         playerData.sendAnimation = true
+    }
+
+    /**
+     * 设置一个玩家的模型
+     * @param player 指定玩家
+     * @param modelLocation 指定模型
+     */
+    fun setModelForPlayer(player: Player,modelLocation: NamespacedKey){
+        val targetData = PlayerDataManager.createOrGetPlayerData(player.name)
+
+        val targetModelData = GlobalModelLoader.getTargetModelData(player.name)
+        for((fileName, _) in targetModelData!!.getAllFiles()){
+            if (fileName.endsWith(".png")){
+                targetData.mainTextPngResourceLocation = NamespacedKey.fromString("$modelLocation/$fileName")!!
+            }
+        }
+
+        targetData.mainResourceLocation = modelLocation
+        targetData.isDirty = true
+
+        for (singlePlayer in Bukkit.getOnlinePlayers()){
+            singlePlayer.getConnection()?.sendModelUpdate(player)
+        }
+    }
+
+    /**
+     * 设置一个玩家的模型
+     * @param player 目标玩家
+     * @param modelLocation 指定模型
+     * @param textureLocation 指定模型的材质文件的路径
+     */
+    fun setModelForPlayer(player: Player,modelLocation: NamespacedKey,textureLocation: NamespacedKey){
+        val targetData = PlayerDataManager.createOrGetPlayerData(player.name)
+        targetData.mainResourceLocation = modelLocation
+        targetData.mainTextPngResourceLocation = textureLocation
+        targetData.isDirty = true
+
+        for (singlePlayer in Bukkit.getOnlinePlayers()){
+            singlePlayer.getConnection()?.sendModelUpdate(player)
+        }
     }
 }

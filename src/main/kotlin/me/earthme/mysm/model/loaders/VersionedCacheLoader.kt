@@ -35,6 +35,10 @@ object VersionedCacheLoader {
     private var pluginInstance: Plugin? = null
     private var metaArray: YsmVersionMetaArray? = null
 
+    fun hasLoadedModel(modelName: String): Boolean{
+        return this.modelToVersion2Caches.containsKey(modelName)
+    }
+
     fun reloadCaches(){
         this.deleteAllCacheFiles()
         this.dropAllLoadedCaches()

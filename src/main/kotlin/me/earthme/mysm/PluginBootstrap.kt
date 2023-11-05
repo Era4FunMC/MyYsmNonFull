@@ -36,6 +36,7 @@ object PluginBootstrap {
         Bukkit.getPluginCommand("listysmplayers")!!.setExecutor(ListPlayersCommand())
         Bukkit.getPluginCommand("dmodelfp")!!.setExecutor(DropModelPlayerCommand())
         Bukkit.getPluginCommand("playanimationonplayer")!!.setExecutor(PlayAnimationCommand())
+        Bukkit.getPluginCommand("smodelfp")!!.setExecutor(SetPlayerModelCommand())
         pluginInstance.logger.info("Registed commands")
     }
 

@@ -30,8 +30,14 @@ commands:
   dmodelfp:
     description: Drop the model for player
     usage: "§cCorrect usage: /dmodelfp <playerName> <modelLocation>"
+  smodelfp:
+    description: Set model for player
+    usage: "§cCorrect usage: /smodelfp <playerName> <modelLocation>"
 
 permissions:
+  myysm.commands.smodelfp:
+    default: false
+    description: Permission to execute smodelfp
   myysm.commands.playanimationonplayer:
     default: false
     description: Permission to execute playanimationonplayer
