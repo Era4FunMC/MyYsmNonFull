@@ -51,27 +51,14 @@ object VersionedCacheLoader {
     }
 
     fun refreshCache(modelData: YsmModelData){
-        val needToRemove: MutableList<File> = ArrayList()
-
         synchronized(this.modelToVersion2Caches){
             if (this.modelToVersion2Caches.containsKey(modelData.getModelName())){
-                for ((version,fileName) in this.modelToVersion2Caches[modelData.getModelName()]!!){
-                    val targetFolder = File(baseCacheDir,"version_${version.version}_${version.modLoader}")
-                    val targetFile = File(targetFolder,fileName)
-
-                    needToRemove.add(targetFile)
-                }
-
                 this.modelToVersion2Caches.remove(modelData.getModelName())
             }
         }
 
-        for (file in needToRemove){
-            file.delete()
-        }
-
         for (singleVersion in this.versionMetaMap){
-            writeToCache(modelData,singleVersion)
+            pushToCacheList(modelData,singleVersion)
         }
     }
 
@@ -96,9 +83,7 @@ object VersionedCacheLoader {
                         return@execute
                     }
 
-                    val targetFolder = File(baseCacheDir,"version_${version.version}_${version.modLoader}")
-                    val targetFile = File(targetFolder,md5WithFileName)
-                    actionIfNotContained.accept(Files.readAllBytes(targetFile.toPath()))
+                    actionIfNotContained.accept(generateCacheDynamic(md5WithFileName))
                 }
             }
         }
@@ -106,7 +91,7 @@ object VersionedCacheLoader {
 
     fun writeCacheForModel(modelData: YsmModelData){
         for (singleVersionMeta in versionMetaMap){
-            this.writeToCache(modelData,singleVersionMeta)
+            this.pushToCacheList(modelData,singleVersionMeta)
         }
     }
 
@@ -114,7 +99,36 @@ object VersionedCacheLoader {
         return this.passwordFileInstance.data
     }
 
-    private fun writeToCache(modelData: YsmModelData, version: YsmVersionMeta){
+    private fun generateCacheDynamic(modelMD5: String): ByteArray {
+        var modelData: YsmModelData? = null
+        var versionMeta: YsmVersionMeta? = null
+
+        synchronized(this.modelToVersion2Caches) {
+            for ((modelName, versionList) in this.modelToVersion2Caches) {
+                for ((versionMetaUnknown, md5) in versionList) {
+                    if (md5 == modelMD5) {
+                        modelData = GlobalModelLoader.getTargetModelData(modelName)!!
+                        versionMeta = versionMetaUnknown
+                        break
+                    }
+                }
+            }
+        }
+
+        val dataClassLoader: URLClassLoader = getCacheDataClassLoaderForVersion(versionMeta!!)!!
+        val modelFileInstance: WrappedCacheData = WrappedCacheData.createFromModelData(
+            modelData!!,
+            dataClassLoader.loadClass(versionMeta!!.dataClassName),
+            dataClassLoader as ClassLoader
+        )
+
+        return modelFileInstance.toWritableBytes(
+            modelFileInstance, passwordFileInstance.secretKey,
+            passwordFileInstance.algorithmParameterSpec
+        )
+    }
+
+    private fun pushToCacheList(modelData: YsmModelData, version: YsmVersionMeta){
         val dataClassLoader: URLClassLoader = getCacheDataClassLoaderForVersion(version)!!
         val modelFileInstance: WrappedCacheData = WrappedCacheData.createFromModelData(
             modelData,
@@ -125,10 +139,6 @@ object VersionedCacheLoader {
         val cacheData = modelFileInstance.toWritableBytes(modelFileInstance, this.passwordFileInstance.secretKey,
             this.passwordFileInstance.algorithmParameterSpec)
         val fileName = MD5Utils.getMd5(cacheData)
-        val targetFolder = File(this.baseCacheDir,"version_${version.version}_${version.modLoader}")
-        targetFolder.mkdirs()
-        val targetCacheFile = File(targetFolder,fileName)
-        Files.write(targetCacheFile.toPath(),cacheData)
 
         synchronized(this.modelToVersion2Caches){
             if (!this.modelToVersion2Caches.containsKey(modelFileInstance.getModelName())) {

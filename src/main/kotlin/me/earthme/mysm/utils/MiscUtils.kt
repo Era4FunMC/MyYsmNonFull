@@ -93,6 +93,7 @@ object MiscUtils {
         for((fileName, _) in targetModelData!!.getAllFiles()){
             if (fileName.endsWith(".png")){
                 targetData.mainTextPngResourceLocation = NamespacedKey.fromString("$modelLocation/$fileName")!!
+                break
             }
         }
 
