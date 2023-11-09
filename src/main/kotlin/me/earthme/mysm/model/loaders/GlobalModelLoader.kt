@@ -44,7 +44,7 @@ object GlobalModelLoader {
         CompletableFuture.allOf(
             *this.loadedYsmModels.values.stream()
                 .map { modelData -> CompletableFuture.runAsync({
-                    VersionedCacheLoader.writeCacheForModel(modelData)
+                    VersionedCacheLoader.pushCacheForModel(modelData)
                 }, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE) }
                 .toArray { i -> arrayOfNulls(i) }
         ).join()

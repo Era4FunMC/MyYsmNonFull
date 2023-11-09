@@ -20,8 +20,12 @@ object MiscUtils {
      * 重载全部的模型
      */
     fun reloadAllModels(){
-        VersionedCacheLoader.reloadCaches()
+        VersionedCacheLoader.dropAll()
         GlobalModelLoader.reloadAll()
+        for (player in Bukkit.getOnlinePlayers()){
+            PlayerDataManager.setToDefaultIfIncorrect(player)
+        }
+        YsmClientConnectionManager.sendReloadToAllPlayers()
     }
 
     /**

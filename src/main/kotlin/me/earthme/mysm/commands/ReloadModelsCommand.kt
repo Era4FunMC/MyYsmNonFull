@@ -17,10 +17,6 @@ class ReloadModelsCommand : CommandExecutor {
         }
 
         MiscUtils.reloadAllModels()
-        for (player in Bukkit.getOnlinePlayers()){
-            PlayerDataManager.setToDefaultIfIncorrect(player)
-        }
-        YsmClientConnectionManager.sendReloadToAllPlayers()
         sender.sendMessage(ChatColor.GREEN.toString() + "Successfully reload all models!")
         return true
     }

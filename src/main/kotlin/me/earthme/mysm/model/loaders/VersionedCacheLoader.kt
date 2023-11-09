@@ -39,8 +39,8 @@ object VersionedCacheLoader {
         return this.modelToVersion2Caches.containsKey(modelName)
     }
 
-    fun reloadCaches(){
-        this.deleteAllCacheFiles()
+    fun dropAll(){
+        //this.deleteAllCacheFiles()
         this.dropAllLoadedCaches()
     }
 
@@ -89,7 +89,7 @@ object VersionedCacheLoader {
         }
     }
 
-    fun writeCacheForModel(modelData: YsmModelData){
+    fun pushCacheForModel(modelData: YsmModelData){
         for (singleVersionMeta in versionMetaMap){
             this.pushToCacheList(modelData,singleVersionMeta)
         }
@@ -219,10 +219,9 @@ object VersionedCacheLoader {
     }
 
     private fun initVars(){
-        this.baseCacheDir = File(this.pluginInstance!!.dataFolder,"ysm_caches")
+        //this.baseCacheDir = File(this.pluginInstance!!.dataFolder,"ysm_caches")
         this.passwordFile = File(this.pluginInstance!!.dataFolder,"password.ysmdata")
         this.modJarFolder = File(this.pluginInstance!!.dataFolder,"mod_jars")
-
     }
 
     fun init(pluginInstance: Plugin){
@@ -230,7 +229,7 @@ object VersionedCacheLoader {
 
         this.initVars()
         this.loadPasswordFile()
-        this.deleteAllCacheFiles()
+        //this.deleteAllCacheFiles()
         this.loadVersionMeta()
         this.downloadModJars()
     }
