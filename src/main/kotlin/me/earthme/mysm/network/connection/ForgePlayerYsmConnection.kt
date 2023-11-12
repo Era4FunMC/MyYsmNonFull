@@ -6,6 +6,7 @@ import io.netty.buffer.Unpooled
 import me.earthme.mysm.utils.SchedulerUtils
 import me.earthme.mysm.data.PlayerModelData
 import me.earthme.mysm.events.PlayerChangeModelEvent
+import me.earthme.mysm.events.PlayerExtraAnimationEvent
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.model.loaders.VersionedCacheLoader
 import me.earthme.mysm.manager.PlayerDataManager
@@ -123,7 +124,7 @@ class ForgePlayerYsmConnection(
 
             7 ->{
                 val aid: Int = byteBuf.readInt() //Animation id
-                if (-1 <= aid && aid < 8) {
+                if (-1 <= aid && aid < 8 && PlayerExtraAnimationEvent(this.player,aid).callEvent()) {
                     val currentHeld: PlayerModelData = PlayerDataManager.createOrGetPlayerData(this.player.name)
                     currentHeld.sendAnimation = true //Set send latch to true to make the players around could see the player's animation
                     if (aid != -1) {

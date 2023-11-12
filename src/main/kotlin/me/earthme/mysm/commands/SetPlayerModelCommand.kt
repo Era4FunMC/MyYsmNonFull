@@ -27,7 +27,7 @@ class SetPlayerModelCommand : CommandExecutor{
             return true
         }
 
-        if (!VersionedCacheLoader.hasLoadedModel(args[1])){
+        if (!VersionedCacheLoader.hasLoadedModel(targetModelLocation.key)){
             sender.sendMessage(ChatColor.RED.toString() + "Target model was not found!")
             return true
         }

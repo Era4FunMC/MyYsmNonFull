@@ -25,76 +25,93 @@ data class ModelPermissionData (
     }
 
     fun setModelNeedAuth(modelLocation: NamespacedKey,needAuth: Boolean){
-        this.isDirty = true
-        if (needAuth){
-            this.modelsNeedAuth.add(modelLocation.toString())
-        }else{
-            this.modelsNeedAuth.remove(modelLocation.toString())
+        synchronized(this){
+            this.isDirty = true
+            if (needAuth){
+                this.modelsNeedAuth.add(modelLocation.toString())
+            }else{
+                this.modelsNeedAuth.remove(modelLocation.toString())
+            }
         }
     }
 
     fun removePlayerHeldModel(modelLocation: NamespacedKey,player: Player){
-        this.isDirty = true
-        val modelLocationString = modelLocation.toString()
+        synchronized(this){
+            this.isDirty = true
+            val modelLocationString = modelLocation.toString()
 
-        for (singleInfo in this.playerHeldModelInfo){
-            if (singleInfo.playerName == player.name){
-                singleInfo.heldModels.remove(modelLocationString)
+            for (singleInfo in this.playerHeldModelInfo){
+                if (singleInfo.playerName == player.name){
+                    singleInfo.heldModels.remove(modelLocationString)
+                }
+                break
             }
-            break
         }
     }
 
     fun addPlayerHeldModel(modelLocation: NamespacedKey,player: Player){
-        this.isDirty = true
-        val modelLocationString = modelLocation.toString()
+        synchronized(this){
+            this.isDirty = true
+            val modelLocationString = modelLocation.toString()
 
-        for (singleInfo in this.playerHeldModelInfo){
-            if (singleInfo.playerName == player.name){
-                if (singleInfo.heldModels.contains(modelLocationString)){
-                    return
+            for (singleInfo in this.playerHeldModelInfo){
+                if (singleInfo.playerName == player.name){
+                    if (singleInfo.heldModels.contains(modelLocationString)){
+                        return
+                    }
+                    singleInfo.heldModels.add(modelLocationString)
+                    break
                 }
-                singleInfo.heldModels.add(modelLocationString)
-                break
             }
-        }
 
-        val newInfo = PlayerHeldModelData(player.name,ConcurrentHashMap.newKeySet())
-        newInfo.heldModels.add(modelLocationString)
-        this.playerHeldModelInfo.add(newInfo)
+            val newInfo = PlayerHeldModelData(player.name,ConcurrentHashMap.newKeySet())
+            newInfo.heldModels.add(modelLocationString)
+            this.playerHeldModelInfo.add(newInfo)
+        }
     }
 
     fun doesPlayerHeldModel(modelLocation: NamespacedKey,player: Player): Boolean{
-        val modelLocationString = modelLocation.toString()
-        for (singleInfo in this.playerHeldModelInfo){
-            if (singleInfo.playerName == player.name){
-                return singleInfo.heldModels.contains(modelLocationString)
+        synchronized(this){
+            val modelLocationString = modelLocation.toString()
+            for (singleInfo in this.playerHeldModelInfo){
+                if (singleInfo.playerName == player.name){
+                    return singleInfo.heldModels.contains(modelLocationString)
+                }
             }
-        }
 
-        return false
+            return false
+        }
     }
 
     fun writeToFile(targetFile: File){
-        val encoded = gson.toJson(this)
+        var encoded: String
+
+        synchronized(this){
+            encoded = gson.toJson(this)
+        }
+
         Files.writeString(targetFile.toPath(),encoded)
     }
 
     fun isModelNeedAuth(modelLocation: NamespacedKey): Boolean{
-        return this.modelsNeedAuth.contains(modelLocation.toString())
+        synchronized(this){
+            return this.modelsNeedAuth.contains(modelLocation.toString())
+        }
     }
 
     fun getAllHeldDataOfPlayer(player: Player): Set<NamespacedKey>{
-        val ret: MutableSet<NamespacedKey> = HashSet()
-        for (data in playerHeldModelInfo){
-            if (data.playerName == player.name){
-                for (modelLocationString in data.heldModels){
-                    ret.add(NamespacedKey.fromString(modelLocationString)!!)
+        synchronized(this){
+            val ret: MutableSet<NamespacedKey> = HashSet()
+            for (data in playerHeldModelInfo){
+                if (data.playerName == player.name){
+                    for (modelLocationString in data.heldModels){
+                        ret.add(NamespacedKey.fromString(modelLocationString)!!)
+                    }
+                    break
                 }
-                break
             }
-        }
 
-        return ret
+            return ret
+        }
     }
 }

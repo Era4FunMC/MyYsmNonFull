@@ -1,6 +1,7 @@
 package me.earthme.mysm.commands
 
 import me.earthme.mysm.manager.ModelPermissionManager
+import me.earthme.mysm.model.loaders.VersionedCacheLoader
 import me.earthme.mysm.utils.MiscUtils
 import org.bukkit.ChatColor
 import org.bukkit.NamespacedKey
@@ -19,8 +20,15 @@ class SetModelNeedAuthCommand : CommandExecutor {
             return false
         }
 
+
+
         val targetModel = NamespacedKey.fromString(args[0]) ?: return false
         val needAuth = if (args[1] == "true"){ true } else if (args[1] == "false"){ false } else { return false }
+
+        if (!VersionedCacheLoader.hasLoadedModel(targetModel.key)){
+            sender.sendMessage(ChatColor.RED.toString() + "Target model was not found!")
+            return true
+        }
 
         if (needAuth && ModelPermissionManager.isModelNeedAuth(targetModel)){
             sender.sendMessage(ChatColor.RED.toString() + "Target was already in the auth list!")
