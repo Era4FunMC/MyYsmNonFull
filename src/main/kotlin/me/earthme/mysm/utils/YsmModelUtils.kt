@@ -3,6 +3,7 @@ package me.earthme.mysm.utils
 import com.alibaba.fastjson.JSONObject
 import me.earthme.mysm.model.YsmModelData
 import me.earthme.mysm.utils.model.ModelAnimationMetaFileType
+import kotlin.math.sin
 
 /**
  * 关于YSM模型的一些工具类
@@ -44,7 +45,13 @@ object YsmModelUtils {
         val allFiles = modelInstance.getAllFiles()
         val ret: MutableList<String> = ArrayList()
 
-        for (singleContentData in allFiles.values){
+        val allElements = ModelAnimationMetaFileType.values().map { a -> a.getFileName() }
+
+        for ((fileName,singleContentData) in allFiles){
+            if (!allElements.contains(fileName)){
+                continue
+            }
+
             ret.addAll(getAnimationListFromAnimationJson(String(singleContentData)))
         }
 
