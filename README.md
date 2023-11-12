@@ -6,7 +6,7 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/Era4FunMC/MyYsmNonFull/total?style=for-the-badge)
 
 ## What is this project?
-This project is a simple plugin aims to run some functions of yes_steve_model mod on a plugin server and add more api supports for my smp.
+This project is a simple plugin that aims to run some functions of yes_steve_model mod on a plugin server and add more API support for my SMP.
 
 ## How to build
 
