@@ -19,14 +19,12 @@ class ZipFileYsmLoaderImpl: IModelLoader {
         val animationData: MutableMap<String, ByteArray> = Maps.newHashMap()
         val textureData: MutableMap<String, ByteArray> = Maps.newHashMap()
 
-        val missingFileNames: MutableList<String> = ArrayList(
-            listOf(
-                "main.json",
-                "arm.json",
-                "main.animation.json",
-                "arm.animation.json",
-                "extra.animation.json"
-            )
+        val missingFileNames: MutableList<String> = mutableListOf(
+            "main.json",
+            "arm.json",
+            "main.animation.json",
+            "arm.animation.json",
+            "extra.animation.json"
         )
 
         for ((fileName,data) in zipData) {
