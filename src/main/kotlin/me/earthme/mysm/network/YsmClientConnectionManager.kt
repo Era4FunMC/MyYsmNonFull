@@ -174,9 +174,6 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
             val channelName = wrappedPluginMessage.channelName
             val channelData = wrappedPluginMessage.data
 
-
-            println(channelName)
-            println(String(channelData))
             this.connectionMap[player]?.let{connection ->
                 this.processPacket(channelName,channelData,connection,player)
             }

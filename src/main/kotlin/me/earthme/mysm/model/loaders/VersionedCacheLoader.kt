@@ -58,7 +58,7 @@ object VersionedCacheLoader {
         }
 
         for (singleVersion in this.versionMetaMap){
-            pushToCacheList(modelData,singleVersion)
+            this.pushToCacheList(modelData,singleVersion)
         }
     }
 
@@ -93,6 +93,18 @@ object VersionedCacheLoader {
         for (singleVersionMeta in versionMetaMap){
             this.pushToCacheList(modelData,singleVersionMeta)
         }
+    }
+
+    fun pushCacheForModelAsync(modelData: YsmModelData): CompletableFuture<*>{
+        val allTasks: MutableList<CompletableFuture<*>> = ArrayList(this.versionMetaMap.size)
+
+        for (singleVersionMeta in this.versionMetaMap){
+            allTasks.add(CompletableFuture.runAsync({
+                this.pushToCacheList(modelData,singleVersionMeta)
+            },AsyncExecutor.ASYNC_EXECUTOR_INSTANCE))
+        }
+
+        return CompletableFuture.allOf(*allTasks.stream().toArray { size -> arrayOfNulls<CompletableFuture<*>>(size) })
     }
 
     fun getPasswordData(): ByteArray{

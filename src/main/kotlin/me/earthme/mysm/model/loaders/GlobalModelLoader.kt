@@ -7,6 +7,7 @@ import me.earthme.mysm.model.loaders.impl.FolderYsmModelLoaderImpl
 import me.earthme.mysm.model.loaders.impl.MyYsmModelLoaderImpl
 import me.earthme.mysm.model.loaders.impl.ZipFileYsmLoaderImpl
 import me.earthme.mysm.utils.AsyncExecutor
+import org.apache.commons.lang3.mutable.Mutable
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.Plugin
 import java.io.File
@@ -15,6 +16,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
 import java.util.logging.Level
+import kotlin.collections.ArrayList
 
 object GlobalModelLoader {
     private val allLoaderImpls : MutableSet<IModelLoader> = ConcurrentHashMap.newKeySet()
@@ -41,14 +43,13 @@ object GlobalModelLoader {
     }
 
     private fun writeAllModelsToCache(){
-        CompletableFuture.allOf(
-            *this.loadedYsmModels.values.stream()
-                .map { modelData -> CompletableFuture.runAsync({
-                    VersionedCacheLoader.pushCacheForModel(modelData)
-                }, AsyncExecutor.ASYNC_EXECUTOR_INSTANCE) }
-                .toArray { i -> arrayOfNulls(i) }
-        ).join()
+        val parentTasks: MutableList<CompletableFuture<*>> = ArrayList()
 
+        for (modelData in this.loadedYsmModels.values){
+            parentTasks.add(VersionedCacheLoader.pushCacheForModelAsync(modelData))
+        }
+
+        CompletableFuture.allOf(*parentTasks.stream().toArray { arrayOfNulls<CompletableFuture<*>>(it) }).join()
     }
 
     fun reloadAll(){
