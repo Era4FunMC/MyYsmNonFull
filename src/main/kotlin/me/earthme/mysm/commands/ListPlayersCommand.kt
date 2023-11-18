@@ -16,7 +16,7 @@ class ListPlayersCommand : CommandExecutor {
 
         val builder: StringBuilder = java.lang.StringBuilder()
         for (singlePlayer in YsmClientConnectionManager.getModInstalledPlayers()){
-            builder.append("${ChatColor.GOLD}Player ${ChatColor.GREEN.toString() + singlePlayer.name} is using model ${ChatColor.LIGHT_PURPLE.toString() + PlayerDataManager.createOrGetPlayerData(singlePlayer.name).mainResourceLocation}").append("\n")
+            builder.append("${ChatColor.GOLD}Player ${ChatColor.GREEN.toString() + singlePlayer.name}${ChatColor.GOLD} is using model ${ChatColor.LIGHT_PURPLE.toString() + PlayerDataManager.createOrGetPlayerData(singlePlayer.name).mainResourceLocation}").append("\n")
         }
         sender.sendMessage(builder.toString())
         return true

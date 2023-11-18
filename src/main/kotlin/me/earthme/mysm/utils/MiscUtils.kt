@@ -95,7 +95,7 @@ object MiscUtils {
     fun setModelForPlayer(player: Player,modelLocation: NamespacedKey){
         val targetData = PlayerDataManager.createOrGetPlayerData(player.name)
 
-        val targetModelData = GlobalModelLoader.getTargetModelData(player.name)
+        val targetModelData = GlobalModelLoader.getTargetModelData(modelLocation.key)
         for((fileName, _) in targetModelData!!.getAllFiles()){
             if (fileName.endsWith(".png")){
                 targetData.mainTextPngResourceLocation = NamespacedKey.fromString("$modelLocation/$fileName")!!
