@@ -7,6 +7,8 @@ import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.model.loaders.GlobalModelLoader
 import me.earthme.mysm.network.YsmClientConnectionManager
 import me.earthme.mysm.network.YsmClientConnectionManager.getConnection
+import me.earthme.mysm.network.packets.s2c.YsmS2CEntityActionPacket
+import me.earthme.mysm.network.packets.s2c.YsmS2COwnedModelListPacket
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -52,7 +54,7 @@ object MiscUtils {
      */
     fun dropModelForPlayer(targetPlayer: Player,targetModel: NamespacedKey){
         ModelPermissionManager.removePlayerHeldModel(targetPlayer,targetModel)
-        targetPlayer.getConnection()?.sendHeldModes(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer))
+        targetPlayer.getConnection()?.sendPacket(YsmS2COwnedModelListPacket(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer)))
         PlayerDataManager.setToDefaultIfIncorrect(targetPlayer) //Correct if the current model is removed
         PlayerDataManager.createOrGetPlayerData(targetPlayer.name).sendAnimation = true //Set send latch to true
     }
@@ -64,7 +66,7 @@ object MiscUtils {
      */
     fun giveModelToPlayer(targetPlayer: Player,targetModel: NamespacedKey){
         ModelPermissionManager.addPlayerHeldModel(targetPlayer,targetModel)
-        targetPlayer.getConnection()?.sendHeldModes(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer))
+        targetPlayer.getConnection()?.sendPacket(YsmS2COwnedModelListPacket(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer)))
     }
 
     /**
@@ -105,7 +107,7 @@ object MiscUtils {
         targetData.isDirty = true
 
         for (singlePlayer in Bukkit.getOnlinePlayers()){
-            singlePlayer.getConnection()?.sendModelUpdate(player)
+            singlePlayer.getConnection()?.sendPacket(YsmS2CEntityActionPacket(player))
         }
     }
 
@@ -122,7 +124,7 @@ object MiscUtils {
         targetData.isDirty = true
 
         for (singlePlayer in Bukkit.getOnlinePlayers()){
-            singlePlayer.getConnection()?.sendModelUpdate(player)
+            singlePlayer.getConnection()?.sendPacket(YsmS2CEntityActionPacket(player))
         }
     }
 }

@@ -1,6 +1,8 @@
 package me.earthme.mysm.network.connection
 
 import io.netty.buffer.ByteBuf
+import me.earthme.mysm.network.EnumConnectionType
+import me.earthme.mysm.network.packets.IYsmPacket
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 
@@ -15,17 +17,7 @@ interface PlayerYsmConnection {
 
     fun onPlayerLeft(player: Player)
 
-    fun sendPacket(packetData: ByteBuf,packetId: NamespacedKey)
+    fun sendPacket(packet: IYsmPacket)
 
-    fun onMessageIncoming(key: NamespacedKey,packetData: ByteArray)
-
-    fun sendHeldModes(models: Set<NamespacedKey>)
-
-    fun sendReload()
-
-    fun sendModelUpdate(ownerEntity: Player)
-
-    fun sendMd5Contained(containedMd5: String)
-
-    fun sendModelOrPasswordData(data: ByteArray)
+    fun getConnectionType(): EnumConnectionType
 }

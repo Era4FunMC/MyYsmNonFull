@@ -6,10 +6,12 @@ import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage
 import io.netty.buffer.Unpooled
+import me.earthme.mysm.network.coders.YsmPacketDecoder
 import me.earthme.mysm.utils.SchedulerUtils
 import me.earthme.mysm.network.connection.FabricPlayerYsmConnection
 import me.earthme.mysm.network.connection.ForgePlayerYsmConnection
 import me.earthme.mysm.network.connection.PlayerYsmConnection
+import me.earthme.mysm.network.packets.s2c.YsmS2CSyncRequestPacket
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import org.bukkit.Bukkit
@@ -17,7 +19,6 @@ import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.Plugin
@@ -134,7 +135,7 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
     fun sendReloadToAllPlayers(){
         for (player in Bukkit.getOnlinePlayers()){
-            player.getConnection()?.sendReload()
+            player.getConnection()?.sendPacket(YsmS2CSyncRequestPacket())
         }
     }
 
@@ -142,18 +143,42 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
         return this.modInstalledPlayerList //Return a immutable list
     }
 
+    private fun processPacket(channelName: String,channelData: ByteArray,connection: PlayerYsmConnection,player: Player){
+        try {
+            val decodedPacket = YsmPacketDecoder.INSTANCE.readFromCustomPayload(
+                Unpooled.copiedBuffer(channelData),
+                NamespacedKey.fromString(channelName)!!,
+                EnumConnectionType.fromConnection(connection))
+
+            SchedulerUtils.schedulerAsExecutor(player.location).execute {
+                try {
+                    decodedPacket!!.process(connection.getConnectionType(),player)
+                }catch (e: Exception){
+                    this.pluginInstance!!.logger.severe("Failed to process packet ${decodedPacket?.toString() ?: "NULL"},Exception : ${e.cause}")
+                }
+            }
+        }catch (e: Exception){
+            this.pluginInstance!!.logger.severe("Failed to decode packet from player ${player.name}! Exception: ${e.cause}")
+        }
+    }
+
     override fun onPacketPlayReceive(event: PacketPlayReceiveEvent){
         if (event.packetType == PacketType.Play.Client.PLUGIN_MESSAGE){
+            if (!(event.player != null && event.player is Player)){
+                return
+            }
+
             val player: Player = event.player as Player
             val wrappedPluginMessage = WrapperPlayClientPluginMessage(event)
 
             val channelName = wrappedPluginMessage.channelName
             val channelData = wrappedPluginMessage.data
 
-            this.connectionMap[player]?.let{
-                if (it.isChannelNameMatched(channelName)){
-                    it.onMessageIncoming(NamespacedKey.fromString(channelName)!!,channelData)
-                }
+
+            println(channelName)
+            println(String(channelData))
+            this.connectionMap[player]?.let{connection ->
+                this.processPacket(channelName,channelData,connection,player)
             }
 
             if (channelName == "minecraft:brand"){
@@ -165,9 +190,9 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
                 }
 
                 this.connectionMap[player] = if (brand.contains("fabric")){
-                    FabricPlayerYsmConnection(player,this.pluginInstance!!)
+                    FabricPlayerYsmConnection(player)
                 }else{
-                    ForgePlayerYsmConnection(player,this.pluginInstance!!)
+                    ForgePlayerYsmConnection(player)
                 }
 
                 player.getConnection()?.onPlayerJoin(player)
