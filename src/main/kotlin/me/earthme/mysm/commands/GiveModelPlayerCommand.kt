@@ -34,7 +34,7 @@ class GiveModelPlayerCommand : CommandExecutor {
         }
 
         MiscUtils.giveModelToPlayer(targetPlayer,targetModel)
-        sender.sendMessage(ChatColor.GREEN.toString()+"Successfully authed model $targetModel for player ${targetPlayer.name}")
+        sender.sendMessage(ChatColor.GREEN.toString()+"Successfully gave model $targetModel to player ${targetPlayer.name}")
         return true
     }
 }
