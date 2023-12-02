@@ -21,6 +21,7 @@ object PluginBootstrap {
         GlobalModelLoader.init(pluginInstance)
         PlayerDataManager.loadAllDataFromFolder(pluginInstance)
         YsmClientConnectionManager.init(pluginInstance)
+        I18nManager.initLanguageFile(pluginInstance,MyYSM.languageName!!)
 
         Bukkit.getPluginManager().registerEvents(YsmClientConnectionManager,pluginInstance)
         PacketEvents.getAPI().eventManager.registerListener(YsmClientConnectionManager)

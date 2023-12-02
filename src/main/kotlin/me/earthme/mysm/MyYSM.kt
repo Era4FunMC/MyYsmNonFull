@@ -2,6 +2,8 @@ package me.earthme.mysm
 
 import me.earthme.mysm.bstats.Metrics
 import me.earthme.mysm.bstats.Metrics.SimplePie
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.java.JavaPlugin
@@ -32,6 +34,7 @@ class MyYSM : JavaPlugin() {
     private fun loadConfigValues(){
         defaultModelLocation = NamespacedKey.fromString(config.getString("default_model_loc")!!)
         defaultModelTextureLocation = NamespacedKey.fromString(config.getString("default_model_texture_loc")!!)
+        languageName = config.getString("language")
     }
 
     override fun onDisable() {
@@ -46,5 +49,6 @@ class MyYSM : JavaPlugin() {
 
         var defaultModelLocation: NamespacedKey? = null
         var defaultModelTextureLocation: NamespacedKey? = null
+        var languageName: String? = "en_US"
     }
 }

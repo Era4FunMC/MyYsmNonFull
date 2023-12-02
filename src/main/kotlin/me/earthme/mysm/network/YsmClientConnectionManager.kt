@@ -152,7 +152,7 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
             SchedulerUtils.schedulerAsExecutor(player.location).execute {
                 try {
-                    decodedPacket!!.process(connection.getConnectionType(),player)
+                    decodedPacket?.process(connection.getConnectionType(),player)
                 }catch (e: Exception){
                     this.pluginInstance!!.logger.severe("Failed to process packet ${decodedPacket?.toString() ?: "NULL"},Exception : ${e.cause}")
                 }

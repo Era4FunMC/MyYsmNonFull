@@ -1,9 +1,9 @@
 package me.earthme.mysm.commands
 
+import me.earthme.mysm.I18nManager
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.utils.MiscUtils
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.NamespacedKey
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
@@ -12,7 +12,7 @@ import org.bukkit.command.CommandSender
 class DropModelPlayerCommand: CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
         if (!sender.hasPermission("myysm.commands.dmodelfp") && !sender.isOp){
-            sender.sendMessage(ChatColor.RED.toString() + "You do not have permission to execute this command!")
+            sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.no_permission"))
             return true
         }
 
@@ -24,17 +24,17 @@ class DropModelPlayerCommand: CommandExecutor {
         val targetModel = NamespacedKey.fromString(args[1]) ?: return false
 
         if (targetPlayer == null || !targetPlayer.isOnline){
-            sender.sendMessage(ChatColor.RED.toString() + "Target player is not online or found!")
+            sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.target_player_not_found"))
             return true
         }
 
         if (!ModelPermissionManager.isModelNeedAuth(targetModel)){
-            sender.sendMessage(ChatColor.RED.toString() + "This model has not require permission yet!")
+            sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.target_model_does_not_require_authentic"))
             return true
         }
 
         MiscUtils.dropModelForPlayer(targetPlayer,targetModel)
-        sender.sendMessage(ChatColor.GREEN.toString()+"Successfully dropped model $targetModel for player ${targetPlayer.name}")
+        sender.sendMessage(I18nManager.parseTranslatableKey("commands.dmodelfp.successfully_executed"))
         return true
     }
 }

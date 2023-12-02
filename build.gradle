@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'gg.earthme.mysm'
-version = '1.5-Aplaha'
+version = '1.6-Beta'
 archivesBaseName = 'MyYsm'
 
 repositories {
@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.github.retrooper.packetevents:spigot:2.0.2'
+    compileOnly 'com.github.retrooper.packetevents:spigot:2.1.0'
     compileOnly 'dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT'
     compileOnly 'io.netty:netty-all:4.1.86.Final'
     implementation 'com.alibaba:fastjson:1.2.83'
@@ -43,7 +43,10 @@ test {
 sourceSets {
     main {
         resources {
-            srcDir(layout.buildDirectory.dir("src/main/resources/ysm_data"))
+            srcDirs(
+                    layout.buildDirectory.dir("src/main/resources/ysm_data"),
+                    layout.buildDirectory.dir("src/main/resources/lang")
+            )
         }
     }
 }

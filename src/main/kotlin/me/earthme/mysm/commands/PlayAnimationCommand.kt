@@ -1,11 +1,11 @@
 package me.earthme.mysm.commands
 
+import me.earthme.mysm.I18nManager
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.model.loaders.GlobalModelLoader
 import me.earthme.mysm.utils.MiscUtils
 import me.earthme.mysm.utils.YsmModelUtils
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -13,7 +13,7 @@ import org.bukkit.command.CommandSender
 class PlayAnimationCommand: CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
         if (!sender.hasPermission("myysm.commands.playanimationonplayer") && !sender.isOp){
-            sender.sendMessage(ChatColor.RED.toString() + "You do not have permission to execute this command!")
+            sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.no_permission"))
             return true
         }
 
@@ -24,7 +24,7 @@ class PlayAnimationCommand: CommandExecutor {
             val targetPlayer = Bukkit.getPlayer(targetPlayerName)
 
             if (targetPlayer == null){
-                sender.sendMessage(ChatColor.RED.toString() + "Target player has not found!")
+                sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.target_player_not_found"))
                 return true
             }
 
@@ -34,11 +34,13 @@ class PlayAnimationCommand: CommandExecutor {
             val allAnimations = YsmModelUtils.getAnimationListFromModel(currentModel)
 
             if (!allAnimations.contains(targetAnimationName)){
-                sender.sendMessage(ChatColor.RED.toString() + "Target animation not found!")
+                sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.target_animation_not_found"))
                 val modelListMsg = StringBuffer()
-                modelListMsg.append("All models of this model:").append("\n")
-                for (modelStr in allAnimations){
-                    modelListMsg.append(modelStr).append("\n")
+                modelListMsg.append(I18nManager.parseTranslatableKey("commands.playanimationonplayer.animation_list_header")).append("\n")
+                for (animationStr in allAnimations){
+                    modelListMsg.append(I18nManager.parseTranslatableKey("commands.playanimationonplayer.single_entry_format",
+                        arrayOf(animationStr)
+                    )).append("\n")
                 }
                 sender.sendMessage(modelListMsg.toString())
                 return true
