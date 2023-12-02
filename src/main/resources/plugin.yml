@@ -13,7 +13,7 @@ depend:
 
 commands:
   playanimationonplayer:
-    description: Playe animation on player
+    description: Play animation on player
     usage: "§cCorrect usage:/playanimationonplayer <player> <animation>"
   gmodeltp:
     description: Give a auth-needed model to the target player
