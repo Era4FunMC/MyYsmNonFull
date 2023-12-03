@@ -20,7 +20,7 @@ import javax.crypto.spec.SecretKeySpec
 
 class MyYsmModelLoaderImpl: IModelLoader{
     override fun canLoad(modelFile: File): Boolean {
-        return !modelFile.isDirectory && modelFile.name.endsWith(".mysm")
+        return !modelFile.isDirectory && modelFile.name.endsWith(".myysm")
     }
 
     override fun loadModel(modelFile: File, authChecker: Function<String, Boolean>): YsmModelData {
