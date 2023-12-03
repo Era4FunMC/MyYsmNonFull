@@ -10,10 +10,10 @@ object I18nManager {
     fun initLanguageFile(pluginInstance: Plugin,languageName: String){
         pluginInstance.logger.info("Loading language file.")
 
-        var internalInputStream = I18nManager.javaClass.getResourceAsStream("lang/${languageName}.yml")
+        var internalInputStream = I18nManager::class.java.classLoader.getResourceAsStream("lang/${languageName}.yml")
         if (internalInputStream == null){
             pluginInstance.logger.warning("The language file set by config has not found!Falling back to en_US")
-            internalInputStream = I18nManager.javaClass.getResourceAsStream("lang/en_US.yml")
+            internalInputStream = I18nManager::class.java.classLoader.getResourceAsStream("lang/en_US.yml")
         }
 
         val configReader = InputStreamReader(internalInputStream!!)
