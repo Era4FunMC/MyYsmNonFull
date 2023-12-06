@@ -1,6 +1,7 @@
 package me.earthme.mysm.command.impl
 
 import me.earthme.mysm.I18nManager
+import me.earthme.mysm.PermissionConstants
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.network.YsmClientConnectionManager
 import org.bukkit.command.Command
@@ -9,7 +10,7 @@ import org.bukkit.command.CommandSender
 
 class ListPlayersCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
-        if (!sender.hasPermission("myysm.commands.listysmplayers") && !sender.isOp){
+        if (!sender.hasPermission(PermissionConstants.cmdListYsmPlayers)){
             sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.no_permission"))
             return true
         }

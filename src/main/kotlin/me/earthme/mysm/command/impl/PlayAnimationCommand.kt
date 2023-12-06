@@ -1,6 +1,7 @@
 package me.earthme.mysm.command.impl
 
 import me.earthme.mysm.I18nManager
+import me.earthme.mysm.PermissionConstants
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.model.loaders.GlobalModelLoader
 import me.earthme.mysm.utils.MiscUtils
@@ -12,7 +13,7 @@ import org.bukkit.command.CommandSender
 
 class PlayAnimationCommand: CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
-        if (!sender.hasPermission("myysm.commands.playanimationonplayer") && !sender.isOp){
+        if (!sender.hasPermission(PermissionConstants.cmdPlayAnimationOnPlayer)) {
             sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.no_permission"))
             return true
         }
