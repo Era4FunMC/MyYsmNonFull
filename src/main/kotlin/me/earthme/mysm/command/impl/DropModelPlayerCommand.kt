@@ -3,6 +3,7 @@ package me.earthme.mysm.command.impl
 import me.earthme.mysm.I18nManager
 import me.earthme.mysm.PermissionConstants
 import me.earthme.mysm.manager.ModelPermissionManager
+import me.earthme.mysm.utils.MessageBuilder
 import me.earthme.mysm.utils.MiscUtils
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -12,8 +13,11 @@ import org.bukkit.command.CommandSender
 
 class DropModelPlayerCommand: CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
+        val mb = MessageBuilder()
+
         if (!sender.hasPermission(PermissionConstants.cmdDMotelFp)){
-            sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.no_permission"))
+            mb.translatable("commands.global.no_permission")
+            sender.sendMessage(mb.toComponent())
             return true
         }
 
@@ -25,17 +29,21 @@ class DropModelPlayerCommand: CommandExecutor {
         val targetModel = NamespacedKey.fromString(args[1]) ?: return false
 
         if (targetPlayer == null || !targetPlayer.isOnline){
-            sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.target_player_not_found"))
+            mb.translatable("commands.global.target_player_not_found")
+            sender.sendMessage(mb.toComponent())
             return true
         }
 
         if (!ModelPermissionManager.isModelNeedAuth(targetModel)){
-            sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.target_model_does_not_require_authentic"))
+            mb.translatable("commands.global.target_model_does_not_require_authentic")
+            sender.sendMessage(mb.toComponent())
             return true
         }
 
         MiscUtils.dropModelForPlayer(targetPlayer,targetModel)
-        sender.sendMessage(I18nManager.parseTranslatableKey("commands.dmodelfp.successfully_executed"))
+
+        mb.translatable("commands.dmodelfp.successfully_executed")
+        sender.sendMessage(mb.toComponent())
         return true
     }
 }

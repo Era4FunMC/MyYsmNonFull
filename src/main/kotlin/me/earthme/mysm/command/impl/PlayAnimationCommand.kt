@@ -4,6 +4,7 @@ import me.earthme.mysm.I18nManager
 import me.earthme.mysm.PermissionConstants
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.model.loaders.GlobalModelLoader
+import me.earthme.mysm.utils.MessageBuilder
 import me.earthme.mysm.utils.MiscUtils
 import me.earthme.mysm.utils.YsmModelUtils
 import org.bukkit.Bukkit
@@ -13,8 +14,10 @@ import org.bukkit.command.CommandSender
 
 class PlayAnimationCommand: CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
+        var mb = MessageBuilder()
+
         if (!sender.hasPermission(PermissionConstants.cmdPlayAnimationOnPlayer)) {
-            sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.no_permission"))
+            sender.sendMessage(mb.translatable("commands.global.no_permission").toComponent())
             return true
         }
 
@@ -25,7 +28,7 @@ class PlayAnimationCommand: CommandExecutor {
             val targetPlayer = Bukkit.getPlayer(targetPlayerName)
 
             if (targetPlayer == null){
-                sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.target_player_not_found"))
+                sender.sendMessage(mb.translatable("commands.global.target_player_not_found").toComponent())
                 return true
             }
 
@@ -35,15 +38,17 @@ class PlayAnimationCommand: CommandExecutor {
             val allAnimations = YsmModelUtils.getAnimationListFromModel(currentModel)
 
             if (!allAnimations.contains(targetAnimationName)){
-                sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.target_animation_not_found"))
-                val modelListMsg = StringBuffer()
-                modelListMsg.append(I18nManager.parseTranslatableKey("commands.playanimationonplayer.animation_list_header")).append("\n")
+                sender.sendMessage(mb.translatable("commands.global.target_animation_not_found").toComponent())
+
+                mb = MessageBuilder()
+
+                mb.translatable("commands.playanimationonplayer.animation_list_header").newLine()
                 for (animationStr in allAnimations){
-                    modelListMsg.append(I18nManager.parseTranslatableKey("commands.playanimationonplayer.single_entry_format",
+                    mb.translatable("commands.playanimationonplayer.single_entry_format",
                         arrayOf(animationStr)
-                    )).append("\n")
+                    ).newLine()
                 }
-                sender.sendMessage(modelListMsg.toString())
+                sender.sendMessage(mb.toComponent())
                 return true
             }
 
