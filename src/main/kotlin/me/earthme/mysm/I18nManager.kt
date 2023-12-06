@@ -16,7 +16,7 @@ object I18nManager {
             internalInputStream = I18nManager::class.java.classLoader.getResourceAsStream("lang/en_US.yml")
         }
 
-        val configReader = InputStreamReader(internalInputStream!!)
+        val configReader = InputStreamReader(internalInputStream!!,"UTF-8")
         configReader.use { reader ->
             languageFile.load(reader)
         }
