@@ -86,6 +86,8 @@ object GlobalModelLoader {
         return this.loadedYsmModels[modelName]
     }
 
+    fun getLoadedModelNames() = loadedYsmModels.keys.stream().toList()
+
     private fun loadSingleModel(file: File){
         val targetModelLoader = this.searchForAMatchedLoader(file)
 

@@ -1,10 +1,17 @@
 package me.earthme.mysm.command
 
+import me.earthme.mysm.command.impl.*
 import org.bukkit.Bukkit
 
 class CommandManager {
     fun init() {
-
+        register(DropModelPlayerCommand())
+        register(GiveModelPlayerCommand())
+        register(ListPlayersCommand())
+        register(PlayAnimationCommand())
+        register(ReloadModelsCommand())
+        register(SetModelNeedAuthCommand())
+        register(SetPlayerModelCommand())
     }
 
     fun register(impl: AbstractCommand) {
@@ -12,7 +19,7 @@ class CommandManager {
 
         cmd.setExecutor(impl)
         cmd.tabCompleter = impl
-        cmd.aliases = impl.aliases
-        cmd.description = impl.desc
+        if (impl.aliases.isNotEmpty()) cmd.aliases = impl.aliases
+        if (impl.desc.isNotEmpty()) cmd.description = impl.desc
     }
 }

@@ -1,18 +1,36 @@
 package me.earthme.mysm.command.impl
 
-import me.earthme.mysm.I18nManager
 import me.earthme.mysm.PermissionConstants
+import me.earthme.mysm.command.AbstractCommand
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.utils.MessageBuilder
 import me.earthme.mysm.utils.MiscUtils
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 
-class GiveModelPlayerCommand : CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
+class GiveModelPlayerCommand : AbstractCommand("gmodeltp") {
+    override fun onTabComplete(
+        sender: CommandSender,
+        command: Command,
+        label: String,
+        args: Array<out String>
+    ): MutableList<String> {
+        val lst = mutableListOf<String>()
+
+        if (args.size == 1){
+            // 参数0：返回玩家名称
+            lst.addAll(onlinePlayerNames(args[0]))
+        } else if (args.size == 2) {
+            // 参数1：返回模型位置
+            lst.addAll(modelLocations(args[1]))
+        }
+
+        return lst
+    }
+
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val mb = MessageBuilder()
 
         if (!sender.hasPermission(PermissionConstants.cmdGModelTp)){
@@ -20,7 +38,7 @@ class GiveModelPlayerCommand : CommandExecutor {
             return true
         }
 
-        if (args == null || args.size != 2){
+        if (args.size != 2){
             return false
         }
 

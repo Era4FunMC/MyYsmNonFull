@@ -1,18 +1,36 @@
 package me.earthme.mysm.command.impl
 
-import me.earthme.mysm.I18nManager
 import me.earthme.mysm.PermissionConstants
+import me.earthme.mysm.command.AbstractCommand
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.model.loaders.VersionedCacheLoader
 import me.earthme.mysm.utils.MessageBuilder
 import me.earthme.mysm.utils.MiscUtils
 import org.bukkit.NamespacedKey
 import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 
-class SetModelNeedAuthCommand : CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
+class SetModelNeedAuthCommand : AbstractCommand("smodelna") {
+    override fun onTabComplete(
+        sender: CommandSender,
+        command: Command,
+        label: String,
+        args: Array<out String>
+    ): MutableList<String> {
+        val lst = mutableListOf<String>()
+
+        if (args.size == 1) {
+            // 参数0：模型名称
+            lst.addAll(modelLocations(args[0]))
+        } else if (args.size == 2) {
+            // 参数1：true/false
+            lst.addAll(trueOrFalse(args[1]))
+        }
+
+        return lst
+    }
+
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val mb = MessageBuilder()
 
         if (!sender.hasPermission(PermissionConstants.modelManagement)){
@@ -20,7 +38,7 @@ class SetModelNeedAuthCommand : CommandExecutor {
             return true
         }
 
-        if (args == null || args.size != 2){
+        if (args.size != 2){
             return false
         }
 

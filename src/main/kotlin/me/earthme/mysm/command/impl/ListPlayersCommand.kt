@@ -1,16 +1,25 @@
 package me.earthme.mysm.command.impl
 
-import me.earthme.mysm.I18nManager
 import me.earthme.mysm.PermissionConstants
+import me.earthme.mysm.command.AbstractCommand
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.network.YsmClientConnectionManager
 import me.earthme.mysm.utils.MessageBuilder
 import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 
-class ListPlayersCommand : CommandExecutor {
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
+class ListPlayersCommand : AbstractCommand("listysmplayers") {
+    override fun onTabComplete(
+        sender: CommandSender,
+        command: Command,
+        label: String,
+        args: Array<out String>
+    ): MutableList<String> {
+        // 无参数
+        return mutableListOf()
+    }
+
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
         val mb = MessageBuilder()
 
         if (!sender.hasPermission(PermissionConstants.cmdListYsmPlayers)){

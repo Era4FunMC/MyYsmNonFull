@@ -87,4 +87,6 @@ object ModelPermissionManager {
     fun removePlayerHeldModel(player: Player,modelLocation: NamespacedKey){
         this.permissionData.removePlayerHeldModel(modelLocation,player)
     }
+
+    fun getPlayerModelList(player: Player) = this.permissionData.getAllHeldDataOfPlayer(player)
 }
