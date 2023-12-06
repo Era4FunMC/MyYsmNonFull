@@ -26,30 +26,48 @@ class MessageBuilder {
         component.append(PREFIX)
     }
 
+    /**
+     * 创建带有前缀的新行
+     */
     fun newLine(): MessageBuilder {
         component.appendNewline().append(PREFIX)
         return this
     }
 
+    /**
+     * 添加文字
+     */
     fun text(content: String): MessageBuilder {
         component.append(Component.text(content))
         return this
     }
 
+    /**
+     * 添加可翻译文字
+     */
     fun translatable(key: String): MessageBuilder {
         text(I18nManager.parseTranslatableKey(key))
         return this
     }
 
+    /**
+     * 添加可翻译文字
+     */
     fun translatable(key: String, args: Array<*>): MessageBuilder {
         text(I18nManager.parseTranslatableKey(key, args))
         return this
     }
 
+    /**
+     * 添加客户端翻译文字
+     */
     fun mTranslatable(key: String): MessageBuilder {
         component.append(Component.translatable(key))
         return this
     }
 
+    /**
+     * 转换为Component
+     */
     fun toComponent() = component.asComponent()
 }
