@@ -4,7 +4,7 @@ import me.earthme.mysm.model.loaders.GlobalModelLoader
 import org.bukkit.Bukkit
 import org.bukkit.command.TabExecutor
 
-abstract class AbstractCommand(val name: String, val desc: String = "", val usage: String = "/$name", val aliases: List<String> = emptyList()): TabExecutor {
+abstract class AbstractCommand(val name: String, val desc: String = "", val aliases: List<String> = emptyList()): TabExecutor {
     /**
      * 返回在线玩家名称，用于TabComplete
      */

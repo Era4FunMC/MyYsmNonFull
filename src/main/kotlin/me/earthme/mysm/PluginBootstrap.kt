@@ -2,7 +2,6 @@ package me.earthme.mysm
 
 import com.github.retrooper.packetevents.PacketEvents
 import me.earthme.mysm.command.CommandManager
-import me.earthme.mysm.command.impl.*
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.model.loaders.GlobalModelLoader

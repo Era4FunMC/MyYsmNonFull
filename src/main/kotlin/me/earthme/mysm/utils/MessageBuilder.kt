@@ -18,6 +18,7 @@ class MessageBuilder {
             .text("[").color(COLOR_GRAY)
             .append(Component.text("MyYSM").color(COLOR_GREEN))
             .append(Component.text("]").color(COLOR_GREEN))
+            .append(Component.text(" ").color(COLOR_RESET))
     }
 
     private val component = Component.text()
