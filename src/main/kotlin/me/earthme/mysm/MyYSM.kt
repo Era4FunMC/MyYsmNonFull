@@ -43,9 +43,10 @@ class MyYSM : JavaPlugin() {
     }
 
     companion object{
-        var instance : MyYSM? = null
-        var metrics: Metrics? = null
-        var isFolia : Boolean = false
+        var instance: MyYSM? = null
+            private set
+        lateinit var metrics: Metrics private set
+        var isFolia: Boolean = false
 
         var defaultModelLocation: NamespacedKey? = null
         var defaultModelTextureLocation: NamespacedKey? = null
