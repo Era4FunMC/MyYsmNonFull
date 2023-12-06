@@ -1,4 +1,4 @@
-package me.earthme.mysm.commands
+package me.earthme.mysm.command.impl
 
 import me.earthme.mysm.I18nManager
 import me.earthme.mysm.manager.ModelPermissionManager
@@ -9,9 +9,9 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 
-class DropModelPlayerCommand: CommandExecutor {
+class GiveModelPlayerCommand : CommandExecutor {
     override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
-        if (!sender.hasPermission("myysm.commands.dmodelfp") && !sender.isOp){
+        if (!sender.hasPermission("myysm.commands.gmodeltp") && !sender.isOp){
             sender.sendMessage(I18nManager.parseTranslatableKey("commands.global.no_permission"))
             return true
         }
@@ -33,8 +33,8 @@ class DropModelPlayerCommand: CommandExecutor {
             return true
         }
 
-        MiscUtils.dropModelForPlayer(targetPlayer,targetModel)
-        sender.sendMessage(I18nManager.parseTranslatableKey("commands.dmodelfp.successfully_executed"))
+        MiscUtils.giveModelToPlayer(targetPlayer,targetModel)
+        sender.sendMessage(I18nManager.parseTranslatableKey("commands.gmodelfp.successfully_executed"))
         return true
     }
 }

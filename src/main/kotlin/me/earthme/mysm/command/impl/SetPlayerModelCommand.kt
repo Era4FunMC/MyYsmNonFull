@@ -1,4 +1,4 @@
-package me.earthme.mysm.commands
+package me.earthme.mysm.command.impl
 
 import me.earthme.mysm.I18nManager
 import me.earthme.mysm.model.loaders.VersionedCacheLoader
