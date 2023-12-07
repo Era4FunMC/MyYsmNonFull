@@ -42,7 +42,7 @@ abstract class AbstractCommand(val name: String, val desc: String = "", val alia
     protected fun modelLocations(s: String): List<String> {
         val lst = mutableListOf<String>()
 
-        for (m in GlobalModelLoader.getLoadedModelNames()) if (m.startsWith(s)) lst.add(m)
+        for (m in GlobalModelLoader.getAllLoadedModels()) if (m.startsWith(s)) lst.add(m)
 
         return lst
     }
