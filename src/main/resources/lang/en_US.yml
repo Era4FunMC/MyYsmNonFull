@@ -4,7 +4,7 @@ commands:
     target_player_not_found: "§cTarget player has not found!"
     target_model_not_found: "§cTarget model has not found!"
     target_model_does_not_require_authentic: "§cThis model has not require permission yet!"
-    target_animation_not_found: "§cTarget model has not found!"
+    target_animation_not_found: "§cTarget animation has not found!"
 
   dmodelfp:
     successfully_executed: "§aSuccessfully dropped model %s for player %s!"
@@ -13,7 +13,7 @@ commands:
   listysmplayers:
     single_entry_format: "§6Player §a%s§a6 is using model §d%s"
   playanimationonplayer:
-    animation_list_header: "All models of this model:"
+    animation_list_header: "All animations of this model:"
     single_entry_format: "%s"
   reloadmodels:
     successfully_executed : "§aSuccessfully reloaded all models!"
