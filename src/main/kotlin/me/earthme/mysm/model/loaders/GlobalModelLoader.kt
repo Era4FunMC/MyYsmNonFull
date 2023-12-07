@@ -7,7 +7,6 @@ import me.earthme.mysm.model.loaders.impl.FolderYsmModelLoaderImpl
 import me.earthme.mysm.model.loaders.impl.MyYsmModelLoaderImpl
 import me.earthme.mysm.model.loaders.impl.ZipFileYsmLoaderImpl
 import me.earthme.mysm.utils.AsyncExecutor
-import org.apache.commons.lang3.mutable.Mutable
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.Plugin
 import java.io.File
@@ -85,6 +84,8 @@ object GlobalModelLoader {
     fun getTargetModelData(modelName: String): YsmModelData?{
         return this.loadedYsmModels[modelName]
     }
+
+    fun getLoadedModelNames() = loadedYsmModels.keys.stream().toList()
 
     private fun loadSingleModel(file: File){
         val targetModelLoader = this.searchForAMatchedLoader(file)

@@ -2,8 +2,6 @@ package me.earthme.mysm
 
 import me.earthme.mysm.bstats.Metrics
 import me.earthme.mysm.bstats.Metrics.SimplePie
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.plugin.java.JavaPlugin
@@ -21,10 +19,10 @@ class MyYSM : JavaPlugin() {
         }catch (_: Exception){ }
 
         metrics = Metrics(this,19774)
-        metrics!!.addCustomChart(SimplePie("server_brand", Callable {
+        metrics.addCustomChart(SimplePie("server_brand", Callable {
             return@Callable Bukkit.getServer().name
         }))
-        metrics!!.addCustomChart(SimplePie("is_folia", Callable {
+        metrics.addCustomChart(SimplePie("is_folia", Callable {
             return@Callable isFolia.toString()
         }))
         this.loadConfigValues()
@@ -43,9 +41,10 @@ class MyYSM : JavaPlugin() {
     }
 
     companion object{
-        var instance : MyYSM? = null
-        var metrics: Metrics? = null
-        var isFolia : Boolean = false
+        var instance: MyYSM? = null
+            private set
+        lateinit var metrics: Metrics private set
+        var isFolia: Boolean = false
 
         var defaultModelLocation: NamespacedKey? = null
         var defaultModelTextureLocation: NamespacedKey? = null
