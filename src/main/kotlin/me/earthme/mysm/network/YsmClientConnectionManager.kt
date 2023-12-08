@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage
 import io.netty.buffer.Unpooled
+import me.earthme.mysm.MyYSM
 import me.earthme.mysm.network.coders.YsmPacketDecoder
 import me.earthme.mysm.utils.SchedulerUtils
 import me.earthme.mysm.network.connection.FabricPlayerYsmConnection
@@ -13,7 +14,9 @@ import me.earthme.mysm.network.connection.ForgePlayerYsmConnection
 import me.earthme.mysm.network.connection.PlayerYsmConnection
 import me.earthme.mysm.network.packets.s2c.YsmS2CSyncRequestPacket
 import me.earthme.mysm.utils.AsyncExecutor
+import me.earthme.mysm.utils.SchedulerUtils.schedulerAsExecutor
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readUtf
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
@@ -22,6 +25,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.Plugin
+import org.bukkit.scheduler.BukkitScheduler
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.LockSupport
@@ -80,7 +84,7 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
             try {
                 for (singlePlayer in  Bukkit.getOnlinePlayers()){
-                    SchedulerUtils.schedulerAsExecutor(singlePlayer.location).execute {
+                    Bukkit.getScheduler().schedulerAsExecutor(singlePlayer.location).execute {
                         connectionMap[singlePlayer]?.tick()
                     }
                 }
@@ -150,7 +154,7 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
                 NamespacedKey.fromString(channelName)!!,
                 EnumConnectionType.fromConnection(connection))
 
-            SchedulerUtils.schedulerAsExecutor(player.location).execute {
+            Bukkit.getScheduler().schedulerAsExecutor(player.location).execute {
                 try {
                     decodedPacket?.process(connection.getConnectionType(),player)
                 }catch (e: Exception){
@@ -180,7 +184,7 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
             if (channelName == "minecraft:brand"){
                 val wrappedData = Unpooled.copiedBuffer(channelData)
-                val brand = MCPacketCodecUtils.readUtf(32767,wrappedData)
+                val brand = wrappedData.readUtf(32767)
 
                 if (this.connectionMap.containsKey(player)){
                     return

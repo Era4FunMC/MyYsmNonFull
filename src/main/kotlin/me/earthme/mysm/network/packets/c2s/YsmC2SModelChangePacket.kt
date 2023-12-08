@@ -7,7 +7,7 @@ import me.earthme.mysm.network.EnumConnectionType
 import me.earthme.mysm.network.YsmClientConnectionManager.getConnection
 import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CEntityActionPacket
-import me.earthme.mysm.utils.mc.MCPacketCodecUtils
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readResourceLocation
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 
@@ -31,8 +31,8 @@ class YsmC2SModelChangePacket : IYsmPacket{
     }
 
     override fun readPacketData(dataBuf: ByteBuf, connectionType: EnumConnectionType) {
-        this.modelLocation = MCPacketCodecUtils.readResourceLocation(dataBuf)
-        this.modelTextureLocation = MCPacketCodecUtils.readResourceLocation(dataBuf)
+        this.modelLocation = dataBuf.readResourceLocation()
+        this.modelTextureLocation = dataBuf.readResourceLocation()
     }
 
     override fun getPacketId(): Int {

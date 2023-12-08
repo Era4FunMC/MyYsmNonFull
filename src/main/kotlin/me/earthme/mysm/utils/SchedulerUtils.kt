@@ -4,6 +4,7 @@ import me.earthme.mysm.MyYSM
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.plugin.Plugin
+import org.bukkit.scheduler.BukkitScheduler
 import java.util.concurrent.Executor
 
 /**
@@ -15,7 +16,7 @@ object SchedulerUtils {
      * @param location 玩家或者这个区域的位置，用于folia兼容的实现
      * @return executor实例
      */
-    fun schedulerAsExecutor(location: Location?): Executor{
+    fun BukkitScheduler.schedulerAsExecutor(location: Location?): Executor{
         return Executor { task ->
             if (!MyYSM.isFolia){
                 Bukkit.getScheduler().runTask(MyYSM.instance!!,task)

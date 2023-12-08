@@ -6,6 +6,8 @@ import me.earthme.mysm.network.EnumConnectionType
 import me.earthme.mysm.network.EnumConnectionType.*
 import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils.writeUUID
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils.writeVarInt
 import me.earthme.mysm.utils.ysm.YsmNbtUtils
 import org.bukkit.entity.Player
 
@@ -20,14 +22,14 @@ class YsmS2CEntityActionPacket(
         when(connectionType){
             FORGE -> {
                 val modelData = PlayerDataManager.createOrGetPlayerData(this.targetPlayer.name)
-                MCPacketCodecUtils.writeVarInt(this.targetPlayer.entityId,dataBuf)
+                dataBuf.writeVarInt(this.targetPlayer.entityId)
                 dataBuf.writeBytes(YsmNbtUtils.createNbtForSync(modelData))
             }
 
             FABRIC -> {
                 val modelData = PlayerDataManager.createOrGetPlayerData(this.targetPlayer.name)
-                MCPacketCodecUtils.writeVarInt(this.targetPlayer.entityId,dataBuf)
-                MCPacketCodecUtils.writeUUID(this.targetPlayer.uniqueId,dataBuf)//Fabric only
+                dataBuf.writeVarInt(this.targetPlayer.entityId)
+                dataBuf.writeUUID(this.targetPlayer.uniqueId)//Fabric only
                 dataBuf.writeBytes(YsmNbtUtils.createNbtForSync(modelData))
             }
 

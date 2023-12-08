@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf
 import me.earthme.mysm.network.EnumConnectionType
 import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils.writeUtf
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils.writeVarInt
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 
@@ -15,9 +17,9 @@ class YsmS2COwnedModelListPacket(
     }
 
     override fun writePacketData(dataBuf: ByteBuf, connectionType: EnumConnectionType) {
-        MCPacketCodecUtils.writeVarInt(this.heldModes.size,dataBuf)
+        dataBuf.writeVarInt(this.heldModes.size)
         for (model in this.heldModes){
-            MCPacketCodecUtils.writeUtf(model.toString(),32767,dataBuf)
+            dataBuf.writeUtf(model.toString(),32767)
         }
     }
 

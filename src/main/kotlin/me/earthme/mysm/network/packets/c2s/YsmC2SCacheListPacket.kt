@@ -12,10 +12,13 @@ import me.earthme.mysm.network.packets.s2c.YsmS2CCacheHitPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CModelDataPacket
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readUtf
+import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readVarInt
 import me.earthme.mysm.utils.ysm.AESEncryptUtils
 import me.earthme.mysm.utils.ysm.MiscUtils
 import org.bukkit.entity.Player
 
+//TODO - Limit the speed of this packet?
 class YsmC2SCacheListPacket : IYsmPacket {
     private val md5List: MutableList<String> = ArrayList()
 
@@ -46,9 +49,9 @@ class YsmC2SCacheListPacket : IYsmPacket {
     }
 
     override fun readPacketData(dataBuf: ByteBuf, connectionType: EnumConnectionType) {
-        val size = MCPacketCodecUtils.readVarInt(dataBuf)
+        val size = dataBuf.readVarInt()
         for (i in 0 until size){
-            this.md5List.add(MCPacketCodecUtils.readUtf(32767,dataBuf))
+            this.md5List.add(dataBuf.readUtf(32767))
         }
     }
 

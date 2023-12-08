@@ -12,12 +12,12 @@ object MCPacketCodecUtils {
     private const val SEGMENT_BITS = 0x7F
     private const val CONTINUE_BIT = 0x80
 
-    fun writeUUID(uuid: UUID,buf: ByteBuf){
-        buf.writeLong(uuid.mostSignificantBits)
-        buf.writeLong(uuid.leastSignificantBits)
+    fun ByteBuf.writeUUID(uuid: UUID){
+        writeLong(uuid.mostSignificantBits)
+        writeLong(uuid.leastSignificantBits)
     }
 
-    fun writeUtf(string: String, maxLength: Int,buf: ByteBuf){
+    fun ByteBuf.writeUtf(string: String, maxLength: Int){
         if (string.length > maxLength) {
             val j = string.length
             throw EncoderException("String too big (was $j characters, max $maxLength)")
@@ -27,18 +27,18 @@ object MCPacketCodecUtils {
             if (abyte.size > k) {
                 throw EncoderException("String too big (was " + abyte.size + " bytes encoded, max " + k + ")")
             } else {
-                writeVarInt(abyte.size,buf)
-                buf.writeBytes(abyte)
+                writeVarInt(abyte.size)
+                writeBytes(abyte)
             }
         }
     }
 
-    fun readVarInt(byteBuf: ByteBuf): Int {
+    fun ByteBuf.readVarInt(): Int {
         var value = 0
         var position = 0
         var currentByte: Byte
         while (true) {
-            currentByte = byteBuf.readByte()
+            currentByte = readByte()
             value = value or (currentByte.toInt() and SEGMENT_BITS shl position)
             if (currentByte.toInt() and CONTINUE_BIT == 0) break
             position += 7
@@ -47,14 +47,14 @@ object MCPacketCodecUtils {
         return value
     }
 
-    fun writeVarInt(value: Int,byteBuf: ByteBuf) {
+    fun ByteBuf.writeVarInt(value: Int) {
         var value = value
         while (true) {
             if (value and SEGMENT_BITS.inv() == 0) {
-                byteBuf.writeByte(value)
+                writeByte(value)
                 return
             }
-            byteBuf.writeByte(value and SEGMENT_BITS or CONTINUE_BIT)
+            writeByte(value and SEGMENT_BITS or CONTINUE_BIT)
 
             // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
             value = value ushr 7
@@ -65,16 +65,16 @@ object MCPacketCodecUtils {
         return decodedLength * 3
     }
 
-    fun readUtf(maxLength: Int,buf: ByteBuf): String {
+    fun ByteBuf.readUtf(maxLength: Int): String {
         val j: Int = getMaxEncodedUtfLength(maxLength)
-        val k = readVarInt(buf)
+        val k = readVarInt()
         return if (k > j) {
             throw DecoderException("The received encoded string buffer length is longer than maximum allowed ($k > $j)")
         } else if (k < 0) {
             throw DecoderException("The received encoded string buffer length is less than zero! Weird string!")
         } else {
-            val s = toString(buf.readerIndex(), k, StandardCharsets.UTF_8,buf)
-            buf.readerIndex(buf.readerIndex() + k)
+            val s = toString(readerIndex(), k, StandardCharsets.UTF_8)
+            readerIndex(readerIndex() + k)
             if (s.length > maxLength) {
                 val l = s.length
                 throw DecoderException("The received string length is longer than maximum allowed ($l > $maxLength)")
@@ -83,12 +83,7 @@ object MCPacketCodecUtils {
             }
         }
     }
-
-    private fun toString(i: Int, j: Int, charset: Charset?, buf: ByteBuf): String {
-        return buf.toString(i, j, charset)
-    }
-
-    fun readResourceLocation(buf: ByteBuf): NamespacedKey{
-        return NamespacedKey.fromString(readUtf(32767,buf))!!
+    fun ByteBuf.readResourceLocation(): NamespacedKey{
+        return NamespacedKey.fromString(readUtf(32767))!!
     }
 }
