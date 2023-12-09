@@ -36,23 +36,23 @@ commands:
 
 permissions:
   myysm.commands.smodelfp:
-    default: false
+    default: op
     description: Permission to execute smodelfp
   myysm.commands.playanimationonplayer:
-    default: false
+    default: op
     description: Permission to execute playanimationonplayer
   myysm.commands.dmodelfp:
-    default: false
+    default: op
     description: Permission to drop the model for player
   myysm.commands.gmodeltp:
-    default: false
+    default: op
     description: Permission of gmodeltp command(Give a auth-needed model to the target player)
   myysm.commands.reload:
-    default: false
+    default: op
     description: Permission to reload all models
   myysm.commands.listysmplayers:
     default: true
     description: Permission to list the players who installed ysm
   myysm.model.management:
-    default: false
+    default: op
     description: Management the models
