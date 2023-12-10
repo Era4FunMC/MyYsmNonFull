@@ -21,6 +21,7 @@ object MiscUtils {
     /**
      * 重载全部的模型
      */
+    @JvmStatic
     fun reloadAllModels(){
         VersionedCacheLoader.dropAll()
         GlobalModelLoader.reloadAll()
@@ -36,6 +37,7 @@ object MiscUtils {
      * @param needAuth 是否要授权才能使用
      * @exception IllegalArgumentException 如果没有找到对应模型会抛出这个
      */
+    @JvmStatic
     fun setModelNeedAuth(modelLocation: NamespacedKey, needAuth: Boolean){
         GlobalModelLoader.getTargetModelData(modelLocation.key)?.let{
             ModelPermissionManager.setModelNeedAuth(modelLocation,needAuth)
@@ -52,6 +54,7 @@ object MiscUtils {
      * @param targetPlayer 目标玩家
      * @param targetModel 目标模型，需要namespace为yes_steve_model，key符合即可
      */
+    @JvmStatic
     fun dropModelForPlayer(targetPlayer: Player,targetModel: NamespacedKey){
         ModelPermissionManager.removePlayerHeldModel(targetPlayer,targetModel)
         targetPlayer.getConnection()?.sendPacket(YsmS2COwnedModelListPacket(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer)))
@@ -64,6 +67,7 @@ object MiscUtils {
      * @param targetPlayer 目标玩家
      * @param targetModel 目标模型，需要namespace为yes_steve_model，key符合即可
      */
+    @JvmStatic
     fun giveModelToPlayer(targetPlayer: Player,targetModel: NamespacedKey){
         ModelPermissionManager.addPlayerHeldModel(targetPlayer,targetModel)
         targetPlayer.getConnection()?.sendPacket(YsmS2COwnedModelListPacket(ModelPermissionManager.getHeldModelsOfPlayer(targetPlayer)))
@@ -74,6 +78,7 @@ object MiscUtils {
      * @param player 目标玩家
      * @param animation 动画名称
      */
+    @JvmStatic
     fun playAnimationOnPlayer(player: Player,animation: String){
         val playerAnimationEvent = PlayerAnimationEvent(player,animation)
 
@@ -92,6 +97,7 @@ object MiscUtils {
      * @param player 指定玩家
      * @param modelLocation 指定模型
      */
+    @JvmStatic
     fun setModelForPlayer(player: Player,modelLocation: NamespacedKey){
         val targetData = PlayerDataManager.createOrGetPlayerData(player.name)
 
@@ -117,6 +123,7 @@ object MiscUtils {
      * @param modelLocation 指定模型
      * @param textureLocation 指定模型的材质文件的路径
      */
+    @JvmStatic
     fun setModelForPlayer(player: Player,modelLocation: NamespacedKey,textureLocation: NamespacedKey){
         val targetData = PlayerDataManager.createOrGetPlayerData(player.name)
         targetData.mainResourceLocation = modelLocation

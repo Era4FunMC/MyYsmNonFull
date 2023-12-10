@@ -17,7 +17,7 @@ class MessageBuilder {
         @JvmStatic val PREFIX = Component
             .text("[").color(COLOR_GRAY)
             .append(Component.text("MyYSM").color(COLOR_GREEN))
-            .append(Component.text("]").color(COLOR_GREEN))
+            .append(Component.text("]").color(COLOR_GRAY))
             .append(Component.text(" ").color(COLOR_RESET))
     }
 
@@ -54,8 +54,8 @@ class MessageBuilder {
     /**
      * 添加可翻译文字
      */
-    fun translatable(key: String, args: Array<*>): MessageBuilder {
-        text(I18nManager.parseTranslatableKey(key, args))
+    fun translatable(key: String, vararg args: Any?): MessageBuilder {
+        text(I18nManager.parseTranslatableKey(key, *args))
         return this
     }
 

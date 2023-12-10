@@ -7,6 +7,7 @@ import me.earthme.mysm.network.YsmClientConnectionManager
 import me.earthme.mysm.utils.message.MessageBuilder
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 
 class ListPlayersCommand : AbstractCommand("listysmplayers") {
     override fun onTabComplete(
@@ -27,10 +28,13 @@ class ListPlayersCommand : AbstractCommand("listysmplayers") {
             return true
         }
 
-        for (singlePlayer in YsmClientConnectionManager.getModInstalledPlayers()){
+        val playersCopy = ArrayList(YsmClientConnectionManager.getModInstalledPlayers())
+        for ((index, singlePlayer) in playersCopy.withIndex()){
             mb
-                .translatable("commands.listysmplayers.single_entry_format", arrayOf(singlePlayer.name,PlayerDataManager.createOrGetPlayerData(singlePlayer.name).mainResourceLocation.toString()))
-                .newLine()
+                .translatable("commands.listysmplayers.single_entry_format", singlePlayer.name,PlayerDataManager.createOrGetPlayerData(singlePlayer.name).mainResourceLocation.toString())
+            if (index < playersCopy.size){
+                mb.newLine()
+            }
         }
         sender.sendMessage(mb.toComponent())
         return true

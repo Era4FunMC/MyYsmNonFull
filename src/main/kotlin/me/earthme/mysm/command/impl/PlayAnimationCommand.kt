@@ -65,9 +65,7 @@ class PlayAnimationCommand: AbstractCommand("playanimationonplayer") {
 
                 mb.translatable("commands.playanimationonplayer.animation_list_header").newLine()
                 for (animationStr in allAnimations){
-                    mb.translatable("commands.playanimationonplayer.single_entry_format",
-                        arrayOf(animationStr)
-                    ).newLine()
+                    mb.translatable("commands.playanimationonplayer.single_entry_format",animationStr).newLine()
                 }
                 sender.sendMessage(mb.toComponent())
                 return true

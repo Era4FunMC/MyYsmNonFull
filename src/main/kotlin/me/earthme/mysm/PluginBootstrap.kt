@@ -14,9 +14,10 @@ import org.bukkit.plugin.Plugin
  * 用于初始化整个插件的类()
  */
 object PluginBootstrap {
-    lateinit var commandManager: CommandManager
+    @JvmStatic lateinit var commandManager: CommandManager
         private set
 
+    @JvmStatic
     fun initAll(pluginInstance: Plugin){
         ResourceConstants.initAll(pluginInstance)
         ModelPermissionManager.loadOrInitFromFile(pluginInstance)
@@ -40,6 +41,7 @@ object PluginBootstrap {
         pluginInstance.logger.info("Registered command")
     }
 
+    @JvmStatic
     fun unloadAll(pluginInstance: Plugin){
         pluginInstance.logger.info("Closing all managers")
         PlayerDataManager.saveAllData()

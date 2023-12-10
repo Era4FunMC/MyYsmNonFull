@@ -5,7 +5,7 @@ import org.bukkit.plugin.Plugin
 import java.io.InputStreamReader
 
 object I18nManager {
-    private val languageFile : YamlConfiguration = YamlConfiguration()
+    @JvmStatic private val languageFile : YamlConfiguration = YamlConfiguration()
 
     fun initLanguageFile(pluginInstance: Plugin,languageName: String){
         pluginInstance.logger.info("Loading language file.")
@@ -23,11 +23,11 @@ object I18nManager {
         pluginInstance.logger.info("Loaded language file!")
     }
 
-    fun parseTranslatableKey(messageKey: String, args: Array<*>): String {
+    fun parseTranslatableKey(messageKey: String, vararg args: Any?): String {
         val targetMessageUnmapped = this.languageFile.getString(messageKey)
             ?: throw IllegalArgumentException("Target translatable key has not found!")
 
-        return String.format(targetMessageUnmapped, args)
+        return String.format(targetMessageUnmapped, *args)
     }
 
     fun parseTranslatableKey(messageKey: String): String {

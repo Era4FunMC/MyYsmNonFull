@@ -14,6 +14,7 @@ object YsmModelUtils {
      * @param input 动作名称
      * @return 是否是一个合法的轮盘动作，如果是则为true，反之为false
      */
+    @JvmStatic
     fun hasAnyExtraAnimation(input: String): Boolean{
         if (input.length != 6){
             return false
@@ -40,6 +41,7 @@ object YsmModelUtils {
      * @param modelInstance 模型数据
      * @return 动作列表
      */
+    @JvmStatic
     fun getAnimationListFromModel(modelInstance: YsmModelData): List<String>{
         val allFiles = modelInstance.getAllFiles()
         val ret: MutableList<String> = ArrayList()
@@ -63,6 +65,7 @@ object YsmModelUtils {
      * @param modelAnimationMetaFileType 模型动作数据的类型（目前还没有tac的）
      * @return 动作列表
      */
+    @JvmStatic
     fun getAnimationListFromModel(modelInstance: YsmModelData, modelAnimationMetaFileType: ModelAnimationMetaFileType): List<String>{
         val allFiles = modelInstance.getAllFiles()
         val ret: MutableList<String> = ArrayList()
@@ -80,6 +83,7 @@ object YsmModelUtils {
      * @param jsonStr 要解析的json文本
      * @return 动作列表
      */
+    @JvmStatic
     fun getAnimationListFromAnimationJson(jsonStr: String): List<String>{
         val jsonObject = JSONObject.parseObject(jsonStr)
         val animationsObject = jsonObject.getJSONObject("animations")

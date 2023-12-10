@@ -5,11 +5,11 @@ import org.bukkit.plugin.Plugin
 import java.io.InputStream
 
 object ResourceConstants {
-    var defaultMainAnimationJsonContent: String? = null
-    var defaultArmAnimationJsonContent: String? = null
-    var defaultExtraAnimationJsonContent: String? = null
+    @JvmStatic var defaultMainAnimationJsonContent: String? = null
+    @JvmStatic var defaultArmAnimationJsonContent: String? = null
+    @JvmStatic var defaultExtraAnimationJsonContent: String? = null
 
-    private var loadedAll = false
+    @JvmStatic private var loadedAll = false
 
 
     /**
@@ -17,6 +17,7 @@ object ResourceConstants {
      * 这个方法只能调用一次,如果第二次调用，它会忽略掉，因为已经加载过一次了
      * @param pluginInstance 插件的实例
      */
+    @JvmStatic
     fun initAll(pluginInstance: Plugin){
         if (loadedAll){
             pluginInstance.logger.info("All constant has loaded!Skipping")
