@@ -17,56 +17,55 @@ import javax.crypto.spec.SecretKeySpec
 
 object AESEncryptUtils {
     @Throws(Exception::class)
-    fun encryptDataWithKnownKey(paramArrayOfbyte1: ByteArray?, paramArrayOfbyte2: ByteArray?): ByteArray {
+    fun encryptAES(paramArrayOfbyte1: ByteArray?, paramArrayOfbyte2: ByteArray?): ByteArray {
         val secretKeySpec = SecretKeySpec(paramArrayOfbyte1, "AES")
         val ivParameterSpec = IvParameterSpec(paramArrayOfbyte1)
-        return encrypt(secretKeySpec, ivParameterSpec, paramArrayOfbyte2).toByteArray()
+        return encryptAES(secretKeySpec, ivParameterSpec, paramArrayOfbyte2).toByteArray()
     }
 
-    private const val ALGORITHM = "AES/CBC/PKCS5Padding"
     @Throws(IOException::class, GeneralSecurityException::class)
-    fun encrypt(secretKey: SecretKey?, paramAlgorithmParameterSpec: AlgorithmParameterSpec?, data: ByteArray?): ByteArrayOutputStream {
-        val byteArrayInputStream = ByteArrayInputStream(data)
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        val cipher = Cipher.getInstance(ALGORITHM)
+    fun encryptAES(secretKey: SecretKey?, paramAlgorithmParameterSpec: AlgorithmParameterSpec?, data: ByteArray?): ByteArrayOutputStream {
+        val inputBuffer = ByteArrayInputStream(data)
+        val outputBuffer = ByteArrayOutputStream()
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, paramAlgorithmParameterSpec)
         val buffer = ByteArray(64)
         var bytesRead: Int
-        while (byteArrayInputStream.read(buffer).also { bytesRead = it } != -1) {
+        while (inputBuffer.read(buffer).also { bytesRead = it } != -1) {
             val encryptedData = cipher.update(buffer, 0, bytesRead)
             if (encryptedData != null) {
-                byteArrayOutputStream.write(encryptedData)
+                outputBuffer.write(encryptedData)
             }
         }
         val finalData = cipher.doFinal()
         if (finalData != null) {
-            byteArrayOutputStream.write(finalData)
+            outputBuffer.write(finalData)
         }
-        return byteArrayOutputStream
+        return outputBuffer
     }
 
     @Throws(IOException::class, GeneralSecurityException::class)
-    fun decrypt(secretKey: SecretKey?, paramAlgorithmParameterSpec: AlgorithmParameterSpec?, data: ByteArray?): ByteArrayOutputStream {
-        val byteArrayInputStream = ByteArrayInputStream(data)
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        val cipher = Cipher.getInstance(ALGORITHM)
+    fun decryptAES(secretKey: SecretKey?, paramAlgorithmParameterSpec: AlgorithmParameterSpec?, data: ByteArray?): ByteArrayOutputStream {
+        val inputBuffer = ByteArrayInputStream(data)
+        val outputBuffer = ByteArrayOutputStream()
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
         cipher.init(Cipher.DECRYPT_MODE, secretKey, paramAlgorithmParameterSpec)
         val buffer = ByteArray(64)
         var bytesRead: Int
-        while (byteArrayInputStream.read(buffer).also { bytesRead = it } != -1) {
+        while (inputBuffer.read(buffer).also { bytesRead = it } != -1) {
             val decryptedData = cipher.update(buffer, 0, bytesRead)
             if (decryptedData != null) {
-                byteArrayOutputStream.write(decryptedData)
+                outputBuffer.write(decryptedData)
             }
         }
         val finalData = cipher.doFinal()
         if (finalData != null) {
-            byteArrayOutputStream.write(finalData)
+            outputBuffer.write(finalData)
         }
-        return byteArrayOutputStream
+        return outputBuffer
     }
 
-    fun generateSecretKey(): SecretKey {
+    fun newRandomAESKey(): SecretKey {
         val keyGenerator: KeyGenerator? = try {
             KeyGenerator.getInstance("AES")
         } catch (noSuchAlgorithmException: NoSuchAlgorithmException) {
@@ -77,12 +76,12 @@ object AESEncryptUtils {
     }
 
     @Contract(value = "_ -> new", pure = true)
-    fun generateSecretKey(keyData: ByteArray?): SecretKey {
+    fun newRandomAESKey(keyData: ByteArray?): SecretKey {
         return SecretKeySpec(keyData, "AES")
     }
 
     @Contract(" -> new")
-    fun generateIV(): IvParameterSpec {
+    fun newRandomIV(): IvParameterSpec {
         val ivBytes = ByteArray(16)
         SecureRandom().nextBytes(ivBytes)
         return IvParameterSpec(ivBytes)

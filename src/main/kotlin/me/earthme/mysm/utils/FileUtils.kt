@@ -50,21 +50,4 @@ object FileUtils {
         bos.close()
         return bos.toByteArray()
     }
-
-
-    fun forEachFolder(folder: File,action: Consumer<File>){
-        if (!folder.isDirectory){
-            return
-        }
-
-        folder.listFiles()?.let{
-            for (singleFile in it){
-                if (singleFile.isDirectory){
-                    forEachFolder(singleFile,action)
-                }
-
-                action.accept(singleFile)
-            }
-        }
-    }
 }

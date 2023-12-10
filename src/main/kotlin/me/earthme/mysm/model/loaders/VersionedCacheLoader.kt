@@ -27,7 +27,6 @@ object VersionedCacheLoader {
 
     private val modelToVersion2Caches: MutableMap<String,MutableMap<YsmVersionMeta,String>> = HashMap()
 
-    private var baseCacheDir: File = File("caches")
     private var modJarFolder: File = File("modjars")
 
     private var passwordFile: File = File("password.ysmdata")
@@ -208,18 +207,6 @@ object VersionedCacheLoader {
         }
     }
 
-    private fun deleteAllCacheFiles(){
-        FileUtils.forEachFolder(this.baseCacheDir){
-            try {
-                if (!it.isDirectory){
-                    it.delete()
-                }
-            }catch (e : Exception){
-                this. pluginInstance!!.logger.log(Level.SEVERE,"Error while deleting cache file ${it.name}!",e)
-            }
-        }
-    }
-
     private fun loadPasswordFile(){
         if (this.passwordFile.exists()){
             this.pluginInstance!!.logger.info("Loading exists password file")
@@ -231,7 +218,6 @@ object VersionedCacheLoader {
     }
 
     private fun initVars(){
-        //this.baseCacheDir = File(this.pluginInstance!!.dataFolder,"ysm_caches")
         this.passwordFile = File(this.pluginInstance!!.dataFolder,"password.ysmdata")
         this.modJarFolder = File(this.pluginInstance!!.dataFolder,"mod_jars")
     }
@@ -241,7 +227,6 @@ object VersionedCacheLoader {
 
         this.initVars()
         this.loadPasswordFile()
-        //this.deleteAllCacheFiles()
         this.loadVersionMeta()
         this.downloadModJars()
     }

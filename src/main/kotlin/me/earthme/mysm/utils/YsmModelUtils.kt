@@ -3,7 +3,6 @@ package me.earthme.mysm.utils
 import com.alibaba.fastjson.JSONObject
 import me.earthme.mysm.model.YsmModelData
 import me.earthme.mysm.utils.model.ModelAnimationMetaFileType
-import kotlin.math.sin
 
 /**
  * 关于YSM模型的一些工具类

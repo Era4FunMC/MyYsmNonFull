@@ -1,4 +1,4 @@
-package me.earthme.mysm.utils
+package me.earthme.mysm.utils.api
 
 import me.earthme.mysm.events.PlayerAnimationEvent
 import me.earthme.mysm.manager.ModelPermissionManager

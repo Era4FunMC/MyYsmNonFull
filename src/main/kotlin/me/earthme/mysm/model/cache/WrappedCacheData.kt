@@ -6,7 +6,6 @@ import me.earthme.mysm.ResourceConstants
 import me.earthme.mysm.model.YsmModelData
 import me.earthme.mysm.utils.*
 import me.earthme.mysm.utils.ysm.*
-import me.earthme.mysm.utils.ysm.MiscUtils
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.security.spec.AlgorithmParameterSpec
@@ -46,13 +45,13 @@ class WrappedCacheData (
                         when (fileName) {
                             "main.json" -> {
                                 val encodedMainJson = GSON_CODEC.fromJson(String(data), dataClass)
-                                val encodedMainObject: ByteArray = MiscUtils.objectToByteArray(encodedMainJson)
+                                val encodedMainObject: ByteArray = YsmCodecUtil.objectToByteArray(encodedMainJson)
                                 metaData["main"] = encodedMainObject
                             }
 
                             "arm.json" -> {
                                 val encodedArmJson = GSON_CODEC.fromJson(String(data), dataClass)
-                                val encodedArmObject: ByteArray = MiscUtils.objectToByteArray(encodedArmJson)
+                                val encodedArmObject: ByteArray = YsmCodecUtil.objectToByteArray(encodedArmJson)
                                 metaData["arm"] = encodedArmObject
                             }
 
@@ -97,10 +96,10 @@ class WrappedCacheData (
         val outputBuffer = ByteArrayOutputStream()
         outputBuffer.write(YsmCodecUtil.intToByteArray(1498629968))
         outputBuffer.write(YsmCodecUtil.intToByteArray(1))
-        val arrayOfByte1 = getEncrypted(data, key, spec)
-        val arrayOfByte2: ByteArray = MD5Utils.degist(arrayOfByte1)!!
-        outputBuffer.write(arrayOfByte2)
-        outputBuffer.write(arrayOfByte1)
+        val encryptedContentData = getEncrypted(data, key, spec)
+        val md5Digest: ByteArray = MD5Utils.degist(encryptedContentData)!!
+        outputBuffer.write(md5Digest)
+        outputBuffer.write(encryptedContentData)
         return outputBuffer.toByteArray()
     }
 
@@ -109,16 +108,16 @@ class WrappedCacheData (
         key: SecretKey,
         spec: AlgorithmParameterSpec
     ): ByteArray {
-        val outputStream = ByteArrayOutputStream()
-        YsmCodecUtil.writeString(outputStream, data.modelName!!)
-        YsmCodecUtil.writeBoolean(outputStream, data.needAuth)
-        YsmCodecUtil.writeMap(outputStream, data.metaData!!)
-        YsmCodecUtil.writeMap(outputStream, data.textureData!!)
-        YsmCodecUtil.writeMap(outputStream, data.animationData!!)
-        YsmCodecUtil.writeBytes(outputStream, data.metaData)
-        YsmCodecUtil.writeBytes(outputStream, data.textureData)
-        YsmCodecUtil.writeBytes(outputStream, data.animationData)
-        val compressedBytes: ByteArray = CompressUtil.compress(outputStream.toByteArray())!!
-        return AESEncryptUtils.encrypt(key, spec, compressedBytes).toByteArray()
+        val outputBuffer = ByteArrayOutputStream()
+        YsmCodecUtil.writeString(outputBuffer, data.modelName!!)
+        YsmCodecUtil.writeBoolean(outputBuffer, data.needAuth)
+        YsmCodecUtil.writeMap(outputBuffer, data.metaData!!)
+        YsmCodecUtil.writeMap(outputBuffer, data.textureData!!)
+        YsmCodecUtil.writeMap(outputBuffer, data.animationData!!)
+        YsmCodecUtil.writeBytes(outputBuffer, data.metaData)
+        YsmCodecUtil.writeBytes(outputBuffer, data.textureData)
+        YsmCodecUtil.writeBytes(outputBuffer, data.animationData)
+        val compressedBytes: ByteArray = CompressUtil.compress(outputBuffer.toByteArray())!!
+        return AESEncryptUtils.encryptAES(key, spec, compressedBytes).toByteArray()
     }
 }

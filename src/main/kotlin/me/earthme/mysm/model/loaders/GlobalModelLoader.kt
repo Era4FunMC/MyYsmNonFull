@@ -85,7 +85,9 @@ object GlobalModelLoader {
         return this.loadedYsmModels[modelName]
     }
 
-    fun getAllLoadedModels(): Set<String> = loadedYsmModels.keys
+    fun getAllLoadedModelNames(): Set<String> = loadedYsmModels.keys
+
+    fun getAllLoadedModelData(): Collection<YsmModelData> = loadedYsmModels.values
 
     private fun loadSingleModel(file: File){
         val targetModelLoader = this.searchForAMatchedLoader(file)
@@ -111,7 +113,7 @@ object GlobalModelLoader {
         return null
     }
 
-    private fun needModelAuth(modelName: String): Boolean{
+    fun needModelAuth(modelName: String): Boolean{
         return ModelPermissionManager.isModelNeedAuth(NamespacedKey("yes_steve_model", modelName))
     }
 }

@@ -6,6 +6,7 @@ import me.earthme.mysm.events.PlayerExtraAnimationEvent
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.network.EnumConnectionType
 import me.earthme.mysm.network.packets.IYsmPacket
+import me.earthme.mysm.utils.api.MiscUtils
 import org.bukkit.entity.Player
 
 class YsmC2SExtraAnimationPacket: IYsmPacket {
@@ -16,7 +17,7 @@ class YsmC2SExtraAnimationPacket: IYsmPacket {
             val currentHeld: PlayerModelData = PlayerDataManager.createOrGetPlayerData(player.name)
             currentHeld.sendAnimation = true //Set send latch to true to make the players around could see the player's animation
             if (this.animationId != -1) {
-                me.earthme.mysm.utils.MiscUtils.playAnimationOnPlayer(player,"extra$animationId")
+                MiscUtils.playAnimationOnPlayer(player,"extra$animationId")
             } else {
                 currentHeld.doAnimation = false
             }

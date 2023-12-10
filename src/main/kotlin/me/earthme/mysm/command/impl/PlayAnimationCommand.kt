@@ -4,8 +4,8 @@ import me.earthme.mysm.PermissionConstants
 import me.earthme.mysm.command.AbstractCommand
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.model.loaders.GlobalModelLoader
-import me.earthme.mysm.utils.MessageBuilder
-import me.earthme.mysm.utils.MiscUtils
+import me.earthme.mysm.utils.message.MessageBuilder
+import me.earthme.mysm.utils.api.MiscUtils
 import me.earthme.mysm.utils.YsmModelUtils
 import org.bukkit.Bukkit
 import org.bukkit.command.Command

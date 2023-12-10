@@ -11,11 +11,11 @@ import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CCacheHitPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CModelDataPacket
 import me.earthme.mysm.utils.AsyncExecutor
-import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readUtf
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readVarInt
 import me.earthme.mysm.utils.ysm.AESEncryptUtils
 import me.earthme.mysm.utils.ysm.MiscUtils
+import me.earthme.mysm.utils.ysm.YsmCodecUtil
 import org.bukkit.entity.Player
 
 //TODO - Limit the speed of this packet?
@@ -39,7 +39,7 @@ class YsmC2SCacheListPacket : IYsmPacket {
             }, matchedVersionMeta)
 
             val passwordData = VersionedCacheLoader.getPasswordData() //From cache loader
-            val processedPasswordData = AESEncryptUtils.encryptDataWithKnownKey(MiscUtils.uuidToByte(player.uniqueId),passwordData) //Encrypt logic in ysm
+            val processedPasswordData = AESEncryptUtils.encryptAES(YsmCodecUtil.uuidToByte(player.uniqueId),passwordData) //Encrypt logic in ysm
             player.getConnection()!!.sendPacket(YsmS2CModelDataPacket(processedPasswordData)) //Send password data
         }
     }

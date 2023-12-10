@@ -105,9 +105,9 @@ class MyYsmModelLoaderImpl: IModelLoader{
         val aesSecretKey = SecretKeySpec(decryptedKeyData,"AES")
         val aesIvKey = IvParameterSpec(decryptedIvKeyData)
 
-        val decryptedContentData = AESEncryptUtils.decrypt(aesSecretKey,aesIvKey,encryptedFileData).toByteArray()
-        val decryptedFileName = AESEncryptUtils.decrypt(aesSecretKey,aesIvKey,encryptedFileNameData).toByteArray()
-        val decryptedSignatureData = AESEncryptUtils.decrypt(aesSecretKey,aesIvKey,signatureDataEncrypted).toByteArray()
+        val decryptedContentData = AESEncryptUtils.decryptAES(aesSecretKey,aesIvKey,encryptedFileData).toByteArray()
+        val decryptedFileName = AESEncryptUtils.decryptAES(aesSecretKey,aesIvKey,encryptedFileNameData).toByteArray()
+        val decryptedSignatureData = AESEncryptUtils.decryptAES(aesSecretKey,aesIvKey,signatureDataEncrypted).toByteArray()
 
         val fileName = String(Base64.getDecoder().decode(decryptedFileName))
 

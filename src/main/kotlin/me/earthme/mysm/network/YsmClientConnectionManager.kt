@@ -1,21 +1,21 @@
 package me.earthme.mysm.network
 
+import com.github.retrooper.packetevents.PacketEvents
 import com.github.retrooper.packetevents.event.PacketListenerPriority
 import com.github.retrooper.packetevents.event.SimplePacketListenerAbstract
 import com.github.retrooper.packetevents.event.simple.PacketPlayReceiveEvent
 import com.github.retrooper.packetevents.protocol.packettype.PacketType
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientPluginMessage
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPluginMessage
+import io.netty.buffer.ByteBuf
 import io.netty.buffer.Unpooled
-import me.earthme.mysm.MyYSM
 import me.earthme.mysm.network.coders.YsmPacketDecoder
-import me.earthme.mysm.utils.SchedulerUtils
 import me.earthme.mysm.network.connection.FabricPlayerYsmConnection
 import me.earthme.mysm.network.connection.ForgePlayerYsmConnection
 import me.earthme.mysm.network.connection.PlayerYsmConnection
 import me.earthme.mysm.network.packets.s2c.YsmS2CSyncRequestPacket
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.utils.SchedulerUtils.schedulerAsExecutor
-import me.earthme.mysm.utils.mc.MCPacketCodecUtils
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readUtf
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
@@ -25,7 +25,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.Plugin
-import org.bukkit.scheduler.BukkitScheduler
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.LockSupport
@@ -45,6 +44,18 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
     fun init(plugin: Plugin){
         this.pluginInstance = plugin
+    }
+
+    fun Player.getConnection(): PlayerYsmConnection?{
+        return connectionMap[player]
+    }
+
+    fun Player.sendCustomPayLoad(channel: NamespacedKey, data: ByteBuf){
+        val byteArray = ByteArray(data.readableBytes())
+        data.readBytes(byteArray)
+        PacketEvents.getAPI().playerManager.sendPacket(this,
+            WrapperPlayServerPluginMessage(channel.toString(),byteArray)
+        )
     }
     
     fun awaitShutdown(){
@@ -94,10 +105,6 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
         }finally{
             isTicking.set(false)
         }
-    }
-
-    fun Player.getConnection(): PlayerYsmConnection?{
-        return connectionMap[player]
     }
 
     @EventHandler

@@ -35,13 +35,6 @@ object PluginBootstrap {
         YsmClientConnectionManager.tickThenSchedule() //Tick once to start the tickloop
 
         pluginInstance.logger.info("Registering command")
-//        Bukkit.getPluginCommand("gmodeltp")!!.setExecutor(GiveModelPlayerCommand())
-//        Bukkit.getPluginCommand("smodelna")!!.setExecutor(SetModelNeedAuthCommand())
-//        Bukkit.getPluginCommand("reloadmodels")!!.setExecutor(ReloadModelsCommand())
-//        Bukkit.getPluginCommand("listysmplayers")!!.setExecutor(ListPlayersCommand())
-//        Bukkit.getPluginCommand("dmodelfp")!!.setExecutor(DropModelPlayerCommand())
-//        Bukkit.getPluginCommand("playanimationonplayer")!!.setExecutor(PlayAnimationCommand())
-//        Bukkit.getPluginCommand("smodelfp")!!.setExecutor(SetPlayerModelCommand())
         commandManager = CommandManager()
         commandManager.init()
         pluginInstance.logger.info("Registered command")

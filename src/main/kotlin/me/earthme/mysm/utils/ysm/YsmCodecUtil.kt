@@ -1,13 +1,32 @@
 package me.earthme.mysm.utils.ysm
 
-
 import org.jetbrains.annotations.Contract
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.ObjectOutputStream
+import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
-
+import java.util.*
 
 object YsmCodecUtil {
+    @Throws(IOException::class)
+    fun <T> objectToByteArray(input: T): ByteArray {
+        ByteArrayOutputStream().use { baseStream ->
+            ObjectOutputStream(baseStream).use { encoder ->
+                encoder.writeObject(input)
+                encoder.flush()
+                return baseStream.toByteArray()
+            }
+        }
+    }
+
+    fun uuidToByte(paramUUID: UUID): ByteArray {
+        val byteBuffer = ByteBuffer.wrap(ByteArray(16))
+        byteBuffer.putLong(paramUUID.mostSignificantBits)
+        byteBuffer.putLong(paramUUID.leastSignificantBits)
+        return byteBuffer.array()
+    }
+
     @Throws(IOException::class)
     fun writeString(paramByteArrayOutputStream: ByteArrayOutputStream, paramString: String) {
         val arrayOfByte = paramString.toByteArray(StandardCharsets.UTF_8)

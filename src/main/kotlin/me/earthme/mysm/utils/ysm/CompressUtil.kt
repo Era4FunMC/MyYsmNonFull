@@ -9,6 +9,7 @@ object CompressUtil {
         if (data.isEmpty()) {
             return ByteArray(0)
         }
+
         val outputStream = ByteArrayOutputStream()
         val buffer = ByteArray(1024)
         val deflater = Deflater(9)

@@ -3,6 +3,7 @@ package me.earthme.mysm.manager
 import com.google.gson.GsonBuilder
 import me.earthme.mysm.MyYSM
 import me.earthme.mysm.data.PlayerModelData
+import me.earthme.mysm.model.loaders.GlobalModelLoader
 import me.earthme.mysm.utils.AsyncExecutor
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -23,22 +24,23 @@ object PlayerDataManager {
     private var shouldSaveNext = true
 
     private fun checkIncorrect(player: Player): Boolean{
-        //TODO Finish it
-        return false
         /*val targetData = ALL_LOADED_DATA[player.name] ?: return false
-        val allModels = ModelLoader.getAllLoaded()
+        val allModels = GlobalModelLoader.getAllLoadedModelData()
         var containedIfNoAuthRequired = false
 
         for (singleModel in allModels){
-            if (singleModel.isNeedAuth() && singleModel.getModelName() == targetData.mainResourceLocation.key && !ModelPermissionManager.isPlayerHeldModel(player,targetData.mainResourceLocation)){ //Because it equals the target target model,So use the inited namespacedkey in the playerdata
+            val needAuth = GlobalModelLoader.needModelAuth(singleModel.getModelName())
+
+            if (needAuth && singleModel.getModelName() == targetData.mainResourceLocation.key && !ModelPermissionManager.isPlayerHeldModel(player,targetData.mainResourceLocation)){ //Because it equals the target model,So use the inited namespacedkey in the playerdata
                 return true //Direct return if it passed the check above
-            }else if(singleModel.getModelName() == targetData.mainResourceLocation.key && !singleModel.isNeedAuth()){
+            }else if(singleModel.getModelName() == targetData.mainResourceLocation.key && !needAuth){
                 containedIfNoAuthRequired = true
                 break //Break out the loop if it contained
             }
         }
 
         return !containedIfNoAuthRequired //If it passed the permission check and it also in the model list,Return true*/
+        return false
     }
 
     fun setToDefaultIfIncorrect(player: Player){

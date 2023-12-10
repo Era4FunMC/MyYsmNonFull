@@ -4,7 +4,7 @@ import me.earthme.mysm.PermissionConstants
 import me.earthme.mysm.command.AbstractCommand
 import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.network.YsmClientConnectionManager
-import me.earthme.mysm.utils.MessageBuilder
+import me.earthme.mysm.utils.message.MessageBuilder
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 

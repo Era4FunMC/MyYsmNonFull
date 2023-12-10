@@ -5,7 +5,7 @@ import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.network.EnumConnectionType
 import me.earthme.mysm.network.YsmClientConnectionManager
 import me.earthme.mysm.network.YsmClientConnectionManager.getConnection
-import me.earthme.mysm.network.YsmPacketHelper
+import me.earthme.mysm.network.YsmClientConnectionManager.sendCustomPayLoad
 import me.earthme.mysm.network.coders.YsmPacketEncoder
 import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CEntityActionPacket
@@ -60,7 +60,7 @@ class ForgePlayerYsmConnection(
 
     override fun sendPacket(packet: IYsmPacket) {
         val encoded = YsmPacketEncoder.encodeYsmPacket(packet,this.connectionType)
-        YsmPacketHelper.sendCustomPayLoad(this.player,encoded.first,encoded.second)
+        this.player.sendCustomPayLoad(encoded.first,encoded.second)
     }
 
     override fun getConnectionType(): EnumConnectionType {

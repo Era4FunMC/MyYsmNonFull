@@ -34,7 +34,7 @@ class CacheAESKeyFile(val secretKey: SecretKey, val algorithmParameterSpec: IvPa
     companion object {
         @get:Contract(" -> new")
         val random: CacheAESKeyFile
-            get() = CacheAESKeyFile(AESEncryptUtils.generateSecretKey(), AESEncryptUtils.generateIV(), null)
+            get() = CacheAESKeyFile(AESEncryptUtils.newRandomAESKey(), AESEncryptUtils.newRandomIV(), null)
 
         fun readFromFile(target: File): CacheAESKeyFile? {
             val allData = Files.readAllBytes(target.toPath())

@@ -3,8 +3,8 @@ package me.earthme.mysm.command.impl
 import me.earthme.mysm.PermissionConstants
 import me.earthme.mysm.command.AbstractCommand
 import me.earthme.mysm.model.loaders.VersionedCacheLoader
-import me.earthme.mysm.utils.MessageBuilder
-import me.earthme.mysm.utils.MiscUtils
+import me.earthme.mysm.utils.message.MessageBuilder
+import me.earthme.mysm.utils.api.MiscUtils
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.command.Command

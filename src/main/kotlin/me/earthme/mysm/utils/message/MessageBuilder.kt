@@ -1,4 +1,4 @@
-package me.earthme.mysm.utils
+package me.earthme.mysm.utils.message
 
 import me.earthme.mysm.I18nManager
 import net.kyori.adventure.text.Component
