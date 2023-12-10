@@ -56,7 +56,7 @@ class GiveModelPlayerCommand : AbstractCommand("gmodeltp") {
         }
 
         MiscUtils.giveModelToPlayer(targetPlayer,targetModel)
-        sender.sendMessage(mb.translatable("commands.gmodelfp.successfully_executed").toComponent())
+        sender.sendMessage(mb.translatable("commands.gmodelfp.successfully_executed", arrayOf(targetModel.toString(),targetPlayer.name)).toComponent())
         return true
     }
 }

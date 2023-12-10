@@ -29,7 +29,7 @@ class ListPlayersCommand : AbstractCommand("listysmplayers") {
 
         for (singlePlayer in YsmClientConnectionManager.getModInstalledPlayers()){
             mb
-                .translatable("commands.listysmplayers.single_entry_format", arrayOf(singlePlayer.name,PlayerDataManager.createOrGetPlayerData(singlePlayer.name).mainResourceLocation))
+                .translatable("commands.listysmplayers.single_entry_format", arrayOf(singlePlayer.name,PlayerDataManager.createOrGetPlayerData(singlePlayer.name).mainResourceLocation.toString()))
                 .newLine()
         }
         sender.sendMessage(mb.toComponent())

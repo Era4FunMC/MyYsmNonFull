@@ -64,7 +64,7 @@ class DropModelPlayerCommand: AbstractCommand("dmodelfp") {
 
         MiscUtils.dropModelForPlayer(targetPlayer,targetModel)
 
-        mb.translatable("commands.dmodelfp.successfully_executed")
+        mb.translatable("commands.dmodelfp.successfully_executed", arrayOf(targetModel.toString(),targetPlayer.name))
         sender.sendMessage(mb.toComponent())
         return true
     }

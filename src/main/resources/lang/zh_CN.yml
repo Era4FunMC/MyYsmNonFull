@@ -1,24 +1,24 @@
 commands:
   global:
-    no_permission: "§c你没有权限执行这个指令!"
-    target_player_not_found: "§c目标玩家未找到!"
-    target_model_not_found: "§c目标模型未找到!"
-    target_model_does_not_require_authentic: "§c这个模型还没有被要求验证后使用!"
-    target_animation_not_found: "§c目标动作未找到!"
+    no_permission: "你没有权限执行这个指令!"
+    target_player_not_found: "目标玩家未找到!"
+    target_model_not_found: "目标模型未找到!"
+    target_model_does_not_require_authentic: "这个模型还没有被要求验证后使用!"
+    target_animation_not_found: "目标动作未找到!"
 
   dmodelfp:
-    successfully_executed: "§a成功删除了{1}的模型{0}!"
+    successfully_executed: "成功删除了{1}的模型{0}!"
   gmodelfp:
-    successfully_executed: "§a成功将模型 %s 给予 %s!"
+    successfully_executed: "成功将模型 %s 给予 %s!"
   listysmplayers:
-    single_entry_format: "§6玩家 §a%s§a6 在使用模型 §d%s"
+    single_entry_format: "玩家 %s 在使用模型 %s"
   playanimationonplayer:
     animation_list_header: "所有这个模型的动作:"
     single_entry_format: "%s"
   reloadmodels:
-    successfully_executed : "§a成功重置了所有模型!"
+    successfully_executed : "成功重置了所有模型!"
   smodelna:
-    target_model_already_in_auth_list: "§c目标模型已在被要求授权列表内!"
-    target_model_already_out_of_auth_list: "§c目标模型已不在被要求授权列表内!"
+    target_model_already_in_auth_list: "目标模型已在被要求授权列表内!"
+    target_model_already_out_of_auth_list: "目标模型已不在被要求授权列表内!"
     #(雾)
-    successfully_executed: "§a成功执行!"
+    successfully_executed: "成功执行!"

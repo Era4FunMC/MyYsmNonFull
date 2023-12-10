@@ -1,24 +1,24 @@
 commands:
   global:
-    no_permission: "§cYou do not have permission to execute this command!"
-    target_player_not_found: "§cTarget player has not found!"
-    target_model_not_found: "§cTarget model has not found!"
-    target_model_does_not_require_authentic: "§cThis model has not require permission yet!"
-    target_animation_not_found: "§cTarget animation has not found!"
+    no_permission: "You do not have permission to execute this command!"
+    target_player_not_found: "Target player has not found!"
+    target_model_not_found: "Target model has not found!"
+    target_model_does_not_require_authentic: "This model has not require permission yet!"
+    target_animation_not_found: "Target animation has not found!"
 
   dmodelfp:
-    successfully_executed: "§aSuccessfully dropped model %s for player %s!"
+    successfully_executed: "Successfully dropped model %s for player %s!"
   gmodelfp:
-    successfully_executed: "§aSuccessfully gave model %s to player %s!"
+    successfully_executed: "Successfully gave model %s to player %s!"
   listysmplayers:
-    single_entry_format: "§6Player §a%s§a6 is using model §d%s"
+    single_entry_format: "Player %s is using model %s"
   playanimationonplayer:
     animation_list_header: "All animations of this model:"
     single_entry_format: "%s"
   reloadmodels:
-    successfully_executed : "§aSuccessfully reloaded all models!"
+    successfully_executed : "Successfully reloaded all models!"
   smodelna:
-    target_model_already_in_auth_list: "§cTarget was already in the auth list!"
-    target_model_already_out_of_auth_list: "§cTarget was already out of auth list!"
+    target_model_already_in_auth_list: "Target was already in the auth list!"
+    target_model_already_out_of_auth_list: "Target was already out of auth list!"
     #(雾)
-    successfully_executed: "§aSuccessfully executed!"
+    successfully_executed: "Successfully executed!"
