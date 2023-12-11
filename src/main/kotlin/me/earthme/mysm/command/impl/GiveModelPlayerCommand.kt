@@ -43,7 +43,7 @@ class GiveModelPlayerCommand : AbstractCommand("gmodeltp") {
         }
 
         val targetPlayer = Bukkit.getPlayer(args[0])
-        val targetModel = NamespacedKey.fromString(args[1]) ?: return false
+        val targetModel = NamespacedKey.fromString("yes_steve_model:" + args[1]) ?: return false
 
         if (targetPlayer == null || !targetPlayer.isOnline){
             sender.sendMessage(mb.translatable("commands.global.target_player_not_found").toComponent())
