@@ -2,14 +2,13 @@ package me.earthme.mysm.utils.ysm
 
 import org.jetbrains.annotations.Contract
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 import java.io.ObjectOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.util.*
 
 object YsmCodecUtil {
-    @Throws(IOException::class)
+
     fun <T> objectToByteArray(input: T): ByteArray {
         ByteArrayOutputStream().use { baseStream ->
             ObjectOutputStream(baseStream).use { encoder ->
@@ -27,36 +26,31 @@ object YsmCodecUtil {
         return byteBuffer.array()
     }
 
-    @Throws(IOException::class)
-    fun writeString(paramByteArrayOutputStream: ByteArrayOutputStream, paramString: String) {
+    fun ByteArrayOutputStream.writeString(paramString: String) {
         val arrayOfByte = paramString.toByteArray(StandardCharsets.UTF_8)
-        paramByteArrayOutputStream.write(intToByteArray(arrayOfByte.size))
-        paramByteArrayOutputStream.write(arrayOfByte)
+        this.write(intToByteArray(arrayOfByte.size))
+        this.write(arrayOfByte)
     }
 
-    @Throws(IOException::class)
-    fun writeBoolean(paramByteArrayOutputStream: ByteArrayOutputStream, paramBoolean: Boolean) {
-        paramByteArrayOutputStream.write(intToByteArray(if (paramBoolean) 1 else 0))
+    fun ByteArrayOutputStream.writeBoolean(paramBoolean: Boolean) {
+        this.write(intToByteArray(if (paramBoolean) 1 else 0))
     }
 
-    @Throws(IOException::class)
-    fun writeMapKey(paramByteArrayOutputStream: ByteArrayOutputStream, paramString: String, paramArrayOfbyte: ByteArray) {
-        writeString(paramByteArrayOutputStream, paramString)
-        paramByteArrayOutputStream.write(intToByteArray(paramArrayOfbyte.size))
+    private fun ByteArrayOutputStream.writeMapKeyPair(paramString: String, paramArrayOfbyte: ByteArray) {
+        this.writeString(paramString)
+        this.write(intToByteArray(paramArrayOfbyte.size))
     }
 
-    @Throws(IOException::class)
-    fun writeMap(paramByteArrayOutputStream: ByteArrayOutputStream, paramMap: Map<String, ByteArray?>) {
-        paramByteArrayOutputStream.write(intToByteArray(paramMap.size))
+    fun ByteArrayOutputStream.writeMapKeys(paramMap: Map<String, ByteArray?>) {
+        this.write(intToByteArray(paramMap.size))
         for (str in paramMap.keys) {
-            writeMapKey(paramByteArrayOutputStream, str, paramMap[str]!!)
+            this.writeMapKeyPair(str, paramMap[str]!!)
         }
     }
 
-    @Throws(IOException::class)
-    fun writeBytes(paramByteArrayOutputStream: ByteArrayOutputStream, paramMap: Map<String, ByteArray>) {
+    fun ByteArrayOutputStream.writeBytesForMap(paramMap: Map<String, ByteArray>) {
         for (arrayOfByte in paramMap.values) {
-            paramByteArrayOutputStream.write(arrayOfByte)
+            this.write(arrayOfByte)
         }
     }
 

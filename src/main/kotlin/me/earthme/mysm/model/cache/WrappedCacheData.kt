@@ -6,6 +6,10 @@ import me.earthme.mysm.ResourceConstants
 import me.earthme.mysm.model.YsmModelData
 import me.earthme.mysm.utils.*
 import me.earthme.mysm.utils.ysm.*
+import me.earthme.mysm.utils.ysm.YsmCodecUtil.writeBoolean
+import me.earthme.mysm.utils.ysm.YsmCodecUtil.writeBytesForMap
+import me.earthme.mysm.utils.ysm.YsmCodecUtil.writeMapKeys
+import me.earthme.mysm.utils.ysm.YsmCodecUtil.writeString
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.security.spec.AlgorithmParameterSpec
@@ -109,14 +113,14 @@ class WrappedCacheData (
         spec: AlgorithmParameterSpec
     ): ByteArray {
         val outputBuffer = ByteArrayOutputStream()
-        YsmCodecUtil.writeString(outputBuffer, data.modelName!!)
-        YsmCodecUtil.writeBoolean(outputBuffer, data.needAuth)
-        YsmCodecUtil.writeMap(outputBuffer, data.metaData!!)
-        YsmCodecUtil.writeMap(outputBuffer, data.textureData!!)
-        YsmCodecUtil.writeMap(outputBuffer, data.animationData!!)
-        YsmCodecUtil.writeBytes(outputBuffer, data.metaData)
-        YsmCodecUtil.writeBytes(outputBuffer, data.textureData)
-        YsmCodecUtil.writeBytes(outputBuffer, data.animationData)
+        outputBuffer.writeString(data.modelName!!)
+        outputBuffer.writeBoolean(data.needAuth)
+        outputBuffer.writeMapKeys(data.metaData!!)
+        outputBuffer.writeMapKeys(data.textureData!!)
+        outputBuffer.writeMapKeys(data.animationData!!)
+        outputBuffer.writeBytesForMap(data.metaData)
+        outputBuffer.writeBytesForMap(data.textureData)
+        outputBuffer.writeBytesForMap(data.animationData)
         val compressedBytes: ByteArray = CompressUtil.compress(outputBuffer.toByteArray())!!
         return AESEncryptUtils.encryptAES(key, spec, compressedBytes).toByteArray()
     }
