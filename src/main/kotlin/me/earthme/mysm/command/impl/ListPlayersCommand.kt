@@ -32,7 +32,7 @@ class ListPlayersCommand : AbstractCommand("listysmplayers") {
         for ((index, singlePlayer) in playersCopy.withIndex()){
             mb
                 .translatable("commands.listysmplayers.single_entry_format", singlePlayer.name,PlayerDataManager.createOrGetPlayerData(singlePlayer.name).mainResourceLocation.toString())
-            if (index < playersCopy.size){
+            if (index + 1 < playersCopy.size){
                 mb.newLine()
             }
         }
