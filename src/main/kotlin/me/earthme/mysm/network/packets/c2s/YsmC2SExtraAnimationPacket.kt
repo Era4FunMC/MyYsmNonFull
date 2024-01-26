@@ -1,6 +1,7 @@
 package me.earthme.mysm.network.packets.c2s
 
 import io.netty.buffer.ByteBuf
+import me.earthme.mysm.MyYSM
 import me.earthme.mysm.data.PlayerModelData
 import me.earthme.mysm.events.PlayerExtraAnimationEvent
 import me.earthme.mysm.manager.PlayerDataManager
@@ -17,6 +18,7 @@ class YsmC2SExtraAnimationPacket: IYsmPacket {
             val currentHeld: PlayerModelData = PlayerDataManager.createOrGetPlayerData(player.name)
             currentHeld.sendAnimation = true //Set send latch to true to make the players around could see the player's animation
             if (this.animationId != -1) {
+                MyYSM.instance!!.logger.info("Player ${player.name} played client animation $animationId")
                 MiscUtils.playAnimationOnPlayer(player,"extra$animationId")
             } else {
                 currentHeld.doAnimation = false

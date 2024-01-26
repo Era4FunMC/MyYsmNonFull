@@ -2,6 +2,7 @@ package me.earthme.mysm.network.packets.c2s
 
 import com.github.retrooper.packetevents.PacketEvents
 import io.netty.buffer.ByteBuf
+import me.earthme.mysm.MyYSM
 import me.earthme.mysm.data.mod.YsmVersionMeta
 import me.earthme.mysm.model.loaders.VersionedCacheLoader
 import me.earthme.mysm.network.EnumConnectionType
@@ -28,6 +29,7 @@ class YsmC2SCacheListPacket : IYsmPacket {
             if(!YsmClientConnectionManager.modInstalledPlayerList.contains(player)){
                 YsmClientConnectionManager.modInstalledPlayerList.add(player)
             }
+            MyYSM.instance!!.logger.info("Player ${player.name} has requested for model cache")
 
             val matchedVersionMeta: YsmVersionMeta = VersionedCacheLoader.getVersionMeta(connectionType.getModLoaderName(),playerProtocolVersion) ?: return@execute
 
@@ -36,6 +38,8 @@ class YsmC2SCacheListPacket : IYsmPacket {
             },{
                 player.getConnection()!!.sendPacket(YsmS2CCacheHitPacket(it)) //If the md5 is in the cache list
             }, matchedVersionMeta)
+
+            MyYSM.instance!!.logger.info("Sent missing model caches to player ${player.name}")
 
             val passwordData = VersionedCacheLoader.getPasswordData() //From cache loader
             val processedPasswordData = AESEncryptUtils.encryptAES(YsmCodecUtil.uuidToByte(player.uniqueId),passwordData) //Encrypt logic in ysm

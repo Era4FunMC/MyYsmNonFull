@@ -7,7 +7,7 @@ commands:
     target_animation_not_found: "Target animation has not found!"
 
   dmodelfp:
-    successfully_executed: "Successfully dropped model %s for player %s!"
+    successfully_executed: "Successfully dropped model %2$s for player %1$s!"
   gmodelfp:
     successfully_executed: "Successfully gave model %s to player %s!"
   listysmplayers:

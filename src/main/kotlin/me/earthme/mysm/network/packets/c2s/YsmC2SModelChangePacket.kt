@@ -1,6 +1,7 @@
 package me.earthme.mysm.network.packets.c2s
 
 import io.netty.buffer.ByteBuf
+import me.earthme.mysm.MyYSM
 import me.earthme.mysm.events.PlayerChangeModelEvent
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.network.EnumConnectionType
@@ -21,8 +22,10 @@ class YsmC2SModelChangePacket : IYsmPacket{
 
         //Check model access
         if ((!ModelPermissionManager.isModelNeedAuth(this.modelLocation!!) || ModelPermissionManager.isPlayerHeldModel(player,this.modelLocation!!)) && playerChangeModelEvent.callEvent()){
+            MyYSM.instance!!.logger.info("Player ${player.name} changed its model to ${this.modelLocation!!}")
             MiscUtils.setModelForPlayer(player,this.modelLocation!!,this.modelTextureLocation!!)
         }else{
+            MyYSM.instance!!.logger.info("Player ${player.name} tried to use an un-allowed model ${this.modelLocation!!}!")
             player.getConnection()!!.sendPacket(YsmS2CEntityActionPacket(player)) //Correct the player model it currently has
         }
     }

@@ -13,6 +13,7 @@ import me.earthme.mysm.network.coders.YsmPacketDecoder
 import me.earthme.mysm.network.connection.FabricPlayerYsmConnection
 import me.earthme.mysm.network.connection.ForgePlayerYsmConnection
 import me.earthme.mysm.network.connection.PlayerYsmConnection
+import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CSyncRequestPacket
 import me.earthme.mysm.utils.AsyncExecutor
 import me.earthme.mysm.utils.SchedulerUtils.schedulerAsExecutor
@@ -44,6 +45,12 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
     fun init(plugin: Plugin){
         this.pluginInstance = plugin
+    }
+
+    fun broadcastToAll(packet: IYsmPacket){
+        for (player in this.modInstalledPlayerList){
+            player.getConnection()?.sendPacket(packet)
+        }
     }
 
     fun Player.getConnection(): PlayerYsmConnection?{
@@ -143,9 +150,7 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
     }
 
     fun sendReloadToAllPlayers(){
-        for (player in Bukkit.getOnlinePlayers()){
-            player.getConnection()?.sendPacket(YsmS2CSyncRequestPacket())
-        }
+        this.broadcastToAll(YsmS2CSyncRequestPacket())
     }
 
     fun getModInstalledPlayers(): List<Player>{

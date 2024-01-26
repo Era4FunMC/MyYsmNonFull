@@ -7,7 +7,7 @@ commands:
     target_animation_not_found: "目标动作未找到!"
 
   dmodelfp:
-    successfully_executed: "成功删除了{1}的模型{0}!"
+    successfully_executed: "成功删除了%2$s的模型%1$s!"
   gmodelfp:
     successfully_executed: "成功将模型 %s 给予 %s!"
   listysmplayers:
