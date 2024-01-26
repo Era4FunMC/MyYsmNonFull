@@ -95,9 +95,7 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
             try {
                 for (singlePlayer in  Bukkit.getOnlinePlayers()){
-                    Bukkit.getScheduler().schedulerAsExecutor(singlePlayer.location).execute {
-                        connectionMap[singlePlayer]?.tick()
-                    }
+                    connectionMap[singlePlayer]?.tick()
                 }
             }catch (e: Exception){
                 e.printStackTrace()

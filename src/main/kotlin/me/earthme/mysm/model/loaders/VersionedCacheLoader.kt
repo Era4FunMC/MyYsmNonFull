@@ -26,6 +26,7 @@ object VersionedCacheLoader {
     private val loadCacheClassLoaders: MutableMap<YsmVersionMeta,URLClassLoader> = ConcurrentHashMap()
 
     private val modelToVersion2Caches: MutableMap<String,MutableMap<YsmVersionMeta,String>> = HashMap()
+    private val md5ToCacheData: MutableMap<String,ByteArray> = HashMap()
 
     private var modJarFolder: File = File("modjars")
 
@@ -39,7 +40,6 @@ object VersionedCacheLoader {
     }
 
     fun dropAll(){
-        //this.deleteAllCacheFiles()
         this.dropAllLoadedCaches()
     }
 
@@ -47,11 +47,20 @@ object VersionedCacheLoader {
         synchronized(this.modelToVersion2Caches){
             this.modelToVersion2Caches.clear()
         }
+
+        synchronized(this.md5ToCacheData){
+            this.md5ToCacheData.clear()
+        }
     }
 
     fun refreshCache(modelData: YsmModelData){
         synchronized(this.modelToVersion2Caches){
             if (this.modelToVersion2Caches.containsKey(modelData.getModelName())){
+                for (md5 in this.modelToVersion2Caches[modelData.getModelName()]!!.values){
+                    synchronized(this.md5ToCacheData){
+                        this.md5ToCacheData.remove(md5)
+                    }
+                }
                 this.modelToVersion2Caches.remove(modelData.getModelName())
             }
         }
@@ -76,13 +85,17 @@ object VersionedCacheLoader {
             for (entry in this.modelToVersion2Caches){
                 AsyncExecutor.ASYNC_EXECUTOR_INSTANCE.execute{
                     val version2Model = entry.value
-                    val md5WithFileName = version2Model[version]!!
-                    if (md5Excludes.contains(md5WithFileName)){
-                        actionIfContained.accept(md5WithFileName)
+                    val cacheMD5Key = version2Model[version]!!
+                    if (md5Excludes.contains(cacheMD5Key)){
+                        actionIfContained.accept(cacheMD5Key)
                         return@execute
                     }
 
-                    actionIfNotContained.accept(generateCacheDynamic(md5WithFileName))
+                    val got: ByteArray = synchronized(this.md5ToCacheData){
+                        this.md5ToCacheData[cacheMD5Key]!!
+                    }
+
+                    actionIfNotContained.accept(got)
                 }
             }
         }
@@ -110,35 +123,6 @@ object VersionedCacheLoader {
         return this.passwordFileInstance.data
     }
 
-    private fun generateCacheDynamic(modelMD5: String): ByteArray {
-        var modelData: YsmModelData? = null
-        var versionMeta: YsmVersionMeta? = null
-
-        synchronized(this.modelToVersion2Caches) {
-            for ((modelName, versionList) in this.modelToVersion2Caches) {
-                for ((versionMetaUnknown, md5) in versionList) {
-                    if (md5 == modelMD5) {
-                        modelData = GlobalModelLoader.getTargetModelData(modelName)!!
-                        versionMeta = versionMetaUnknown
-                        break
-                    }
-                }
-            }
-        }
-
-        val dataClassLoader: URLClassLoader = getCacheDataClassLoaderForVersion(versionMeta!!)!!
-        val modelFileInstance: WrappedCacheData = WrappedCacheData.createFromModelData(
-            modelData!!,
-            dataClassLoader.loadClass(versionMeta!!.dataClassName),
-            dataClassLoader as ClassLoader
-        )
-
-        return modelFileInstance.toWritableBytes(
-            modelFileInstance, passwordFileInstance.secretKey,
-            passwordFileInstance.algorithmParameterSpec
-        )
-    }
-
     private fun pushToCacheList(modelData: YsmModelData, version: YsmVersionMeta){
         val dataClassLoader: URLClassLoader = getCacheDataClassLoaderForVersion(version)!!
         val modelFileInstance: WrappedCacheData = WrappedCacheData.createFromModelData(
@@ -151,12 +135,19 @@ object VersionedCacheLoader {
             this.passwordFileInstance.algorithmParameterSpec)
         val fileName = MD5Utils.getMd5(cacheData)
 
+        //Ensure thread safe
         synchronized(this.modelToVersion2Caches){
             if (!this.modelToVersion2Caches.containsKey(modelFileInstance.getModelName())) {
                 this.modelToVersion2Caches[modelFileInstance.getModelName()] = ConcurrentHashMap()
             }
 
             this.modelToVersion2Caches[modelFileInstance.getModelName()]!![version] = fileName
+
+            synchronized(this.md5ToCacheData){
+                if (!this.md5ToCacheData.containsKey(fileName)){
+                    this.md5ToCacheData[fileName] = cacheData
+                }
+            }
         }
     }
 

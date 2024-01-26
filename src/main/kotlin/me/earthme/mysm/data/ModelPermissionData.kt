@@ -28,9 +28,9 @@ data class ModelPermissionData (
         synchronized(this){
             this.isDirty = true
             if (needAuth){
-                this.modelsNeedAuth.add(modelLocation.toString())
+                this.modelsNeedAuth.add(modelLocation.key)
             }else{
-                this.modelsNeedAuth.remove(modelLocation.toString())
+                this.modelsNeedAuth.remove(modelLocation.key)
             }
         }
     }
@@ -38,11 +38,11 @@ data class ModelPermissionData (
     fun removePlayerHeldModel(modelLocation: NamespacedKey,player: Player){
         synchronized(this){
             this.isDirty = true
-            val modelLocationString = modelLocation.toString()
+            val modelName = modelLocation.key
 
             for (singleInfo in this.playerHeldModelInfo){
                 if (singleInfo.playerName == player.name){
-                    singleInfo.heldModels.remove(modelLocationString)
+                    singleInfo.heldModels.remove(modelName)
                 }
                 break
             }
@@ -52,30 +52,30 @@ data class ModelPermissionData (
     fun addPlayerHeldModel(modelLocation: NamespacedKey,player: Player){
         synchronized(this){
             this.isDirty = true
-            val modelLocationString = modelLocation.toString()
+            val modelName = modelLocation.key
 
             for (singleInfo in this.playerHeldModelInfo){
                 if (singleInfo.playerName == player.name){
-                    if (singleInfo.heldModels.contains(modelLocationString)){
+                    if (singleInfo.heldModels.contains(modelName)){
                         return
                     }
-                    singleInfo.heldModels.add(modelLocationString)
+                    singleInfo.heldModels.add(modelName)
                     break
                 }
             }
 
             val newInfo = PlayerHeldModelData(player.name,ConcurrentHashMap.newKeySet())
-            newInfo.heldModels.add(modelLocationString)
+            newInfo.heldModels.add(modelName)
             this.playerHeldModelInfo.add(newInfo)
         }
     }
 
     fun doesPlayerHeldModel(modelLocation: NamespacedKey,player: Player): Boolean{
         synchronized(this){
-            val modelLocationString = modelLocation.toString()
+            val modelName = modelLocation.key
             for (singleInfo in this.playerHeldModelInfo){
                 if (singleInfo.playerName == player.name){
-                    return singleInfo.heldModels.contains(modelLocationString)
+                    return singleInfo.heldModels.contains(modelName)
                 }
             }
 
@@ -95,7 +95,7 @@ data class ModelPermissionData (
 
     fun isModelNeedAuth(modelLocation: NamespacedKey): Boolean{
         synchronized(this){
-            return this.modelsNeedAuth.contains(modelLocation.toString())
+            return this.modelsNeedAuth.contains(modelLocation.key)
         }
     }
 
@@ -104,8 +104,8 @@ data class ModelPermissionData (
             val ret: MutableSet<NamespacedKey> = HashSet()
             for (data in playerHeldModelInfo){
                 if (data.playerName == player.name){
-                    for (modelLocationString in data.heldModels){
-                        ret.add(NamespacedKey.fromString(modelLocationString)!!)
+                    for (modelName in data.heldModels){
+                        ret.add(NamespacedKey("yes_steve_model",modelName))
                     }
                     break
                 }

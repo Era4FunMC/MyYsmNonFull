@@ -27,7 +27,7 @@ class DropModelPlayerCommand: AbstractCommand("dmodelfp") {
             val player = Bukkit.getPlayer(args[0])
             if (player != null) {
                 // 不存在则不执行
-                for (d in ModelPermissionManager.getPlayerModelList(player)) lst.add(d.toString())
+                for (d in ModelPermissionManager.getPlayerModelList(player).map { it.key }) lst.add(d.toString())
             }
         }
 
@@ -64,7 +64,7 @@ class DropModelPlayerCommand: AbstractCommand("dmodelfp") {
 
         MiscUtils.dropModelForPlayer(targetPlayer,targetModel)
 
-        mb.translatable("commands.dmodelfp.successfully_executed", targetModel.toString(),targetPlayer.name)
+        mb.translatable("commands.dmodelfp.successfully_executed", targetModel.key,targetPlayer.name)
         sender.sendMessage(mb.toComponent())
         return true
     }

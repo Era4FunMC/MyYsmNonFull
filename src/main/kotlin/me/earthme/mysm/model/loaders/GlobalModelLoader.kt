@@ -97,7 +97,9 @@ object GlobalModelLoader {
             return
         }
 
-        val loaded = targetModelLoader.loadModel(file, Function { modelName -> this.needModelAuth(modelName) })
+        val loaded = targetModelLoader.loadModel(file, Function {
+            modelName -> this.needModelAuth(modelName)
+        })
         this.loadedYsmModels[loaded.getModelName()] = loaded
 
         this.pluginInstance!!.logger.info("Loaded model ${loaded.getModelName()}")
@@ -113,7 +115,7 @@ object GlobalModelLoader {
         return null
     }
 
-    fun needModelAuth(modelName: String): Boolean{
+    private fun needModelAuth(modelName: String): Boolean{
         return ModelPermissionManager.isModelNeedAuth(NamespacedKey("yes_steve_model", modelName))
     }
 }

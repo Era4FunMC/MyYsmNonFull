@@ -5,6 +5,7 @@ import me.earthme.mysm.MyYSM
 import me.earthme.mysm.data.PlayerModelData
 import me.earthme.mysm.model.loaders.GlobalModelLoader
 import me.earthme.mysm.utils.AsyncExecutor
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.io.File
@@ -24,22 +25,16 @@ object PlayerDataManager {
     private var shouldSaveNext = true
 
     private fun checkIncorrect(player: Player): Boolean{
-        /*val targetData = ALL_LOADED_DATA[player.name] ?: return false
-        val allModels = GlobalModelLoader.getAllLoadedModelData()
-        var containedIfNoAuthRequired = false
+        val targetData = ALL_LOADED_DATA[player.name] ?: return false
+        val currentModelHeld = GlobalModelLoader.getTargetModelData(targetData.mainResourceLocation.key) ?: return true //If doesn't have this model,we need to correct it
 
-        for (singleModel in allModels){
-            val needAuth = GlobalModelLoader.needModelAuth(singleModel.getModelName())
-
-            if (needAuth && singleModel.getModelName() == targetData.mainResourceLocation.key && !ModelPermissionManager.isPlayerHeldModel(player,targetData.mainResourceLocation)){ //Because it equals the target model,So use the inited namespacedkey in the playerdata
-                return true //Direct return if it passed the check above
-            }else if(singleModel.getModelName() == targetData.mainResourceLocation.key && !needAuth){
-                containedIfNoAuthRequired = true
-                break //Break out the loop if it contained
-            }
+        if (!currentModelHeld.getAuthChecker().apply(currentModelHeld.getModelName())){
+            return false
         }
 
-        return !containedIfNoAuthRequired //If it passed the permission check and it also in the model list,Return true*/
+        if (!ModelPermissionManager.isPlayerHeldModel(player, NamespacedKey("yes_steve_model",currentModelHeld.getModelName()))){
+            return true
+        }
         return false
     }
 

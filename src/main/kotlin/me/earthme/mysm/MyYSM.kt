@@ -49,5 +49,9 @@ class MyYSM : JavaPlugin() {
         var defaultModelLocation: NamespacedKey? = null
         var defaultModelTextureLocation: NamespacedKey? = null
         var languageName: String? = "en_US"
+
+        fun getInstance(): MyYSM{
+            return this.instance!!
+        }
     }
 }
