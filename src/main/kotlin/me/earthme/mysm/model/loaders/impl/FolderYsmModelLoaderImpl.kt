@@ -2,6 +2,7 @@ package me.earthme.mysm.model.loaders.impl
 
 import com.google.common.collect.Maps
 import me.earthme.mysm.ResourceConstants
+import me.earthme.mysm.data.mod.management.EnumModelFileType
 import me.earthme.mysm.model.IModelLoader
 import me.earthme.mysm.model.YsmModelData
 import java.io.File
@@ -11,6 +12,10 @@ import java.util.function.Function
 class FolderYsmModelLoaderImpl: IModelLoader {
     override fun canLoad(modelFile: File): Boolean {
         return modelFile.isDirectory
+    }
+
+    override fun getFileType(): EnumModelFileType {
+        return EnumModelFileType.FOLDER
     }
 
     override fun loadModel(modelFile: File, authChecker: Function<String, Boolean>): YsmModelData {
@@ -55,6 +60,7 @@ class FolderYsmModelLoaderImpl: IModelLoader {
                 "extra.animation.json" -> animationData["extra"] = ResourceConstants.defaultExtraAnimationJsonContent!!.toByteArray()
             }
         }
+
         return YsmModelData(modelFile.name,authChecker,metaData,animationData,textureData)
     }
 }

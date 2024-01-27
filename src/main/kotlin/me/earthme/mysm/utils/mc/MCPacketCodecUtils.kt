@@ -86,4 +86,17 @@ object MCPacketCodecUtils {
     fun ByteBuf.readResourceLocation(): NamespacedKey{
         return NamespacedKey.fromString(readUtf(32767))!!
     }
+
+    fun ByteBuf.writeByteArray(byteArray: ByteArray){
+        this.writeVarInt(byteArray.size)
+        this.writeBytes(byteArray)
+    }
+
+    fun ByteBuf.readByteArray(): ByteArray{
+        val byteArrayWrapped = ByteArray(this.readVarInt())
+        this.readBytes(byteArrayWrapped)
+
+        return byteArrayWrapped
+    }
+
 }

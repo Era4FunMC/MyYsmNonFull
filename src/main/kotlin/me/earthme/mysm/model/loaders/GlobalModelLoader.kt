@@ -1,5 +1,6 @@
 package me.earthme.mysm.model.loaders
 
+import me.earthme.mysm.data.mod.management.YsmModelDesc
 import me.earthme.mysm.manager.ModelPermissionManager
 import me.earthme.mysm.model.IModelLoader
 import me.earthme.mysm.model.YsmModelData
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
 import java.util.logging.Level
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 object GlobalModelLoader {
     private val allLoaderImpls : MutableSet<IModelLoader> = ConcurrentHashMap.newKeySet()
@@ -29,6 +31,28 @@ object GlobalModelLoader {
         this.addDefaultLoaders()
         this.loadAllModels()
         this.writeAllModelsToCache()
+    }
+
+    fun getModelDir(): File{
+        return this.modelDir
+    }
+
+    fun getLoadedModelDesc(): Pair<Set<YsmModelDesc>,Set<YsmModelDesc>>{
+        val customModelDesc: MutableSet<YsmModelDesc> = HashSet()
+        val authModelsDesc: MutableSet<YsmModelDesc> = HashSet()
+
+        for (singleModelData in this.loadedYsmModels.values){
+            val authCheckerOfModel = singleModelData.getAuthChecker()
+            val modelDescOfModel = singleModelData.getModelDesc()
+
+            if (authCheckerOfModel.apply(singleModelData.getModelName())){
+                authModelsDesc.add(modelDescOfModel)
+            }else{
+                customModelDesc.add(modelDescOfModel)
+            }
+        }
+
+        return Pair(customModelDesc,authModelsDesc)
     }
 
     fun addLoader(modelLoader: IModelLoader){
@@ -89,20 +113,28 @@ object GlobalModelLoader {
 
     fun getAllLoadedModelData(): Collection<YsmModelData> = loadedYsmModels.values
 
-    private fun loadSingleModel(file: File){
+    fun loadSingleModel(file: File): YsmModelData?{
         val targetModelLoader = this.searchForAMatchedLoader(file)
 
         if (targetModelLoader == null){
             this.pluginInstance!!.logger.warning("No target loader matched for file ${file.name}!")
-            return
+            return null
         }
 
         val loaded = targetModelLoader.loadModel(file, Function {
             modelName -> this.needModelAuth(modelName)
         })
+        loaded.refreshDesc(targetModelLoader.getFileType())
+
+        if (this.loadedYsmModels.containsKey(loaded.getModelName())){
+            this.pluginInstance!!.logger.warning("Model ${loaded.getModelName()} has already loaded!")
+            return null
+        }
+
         this.loadedYsmModels[loaded.getModelName()] = loaded
 
         this.pluginInstance!!.logger.info("Loaded model ${loaded.getModelName()}")
+        return loaded
     }
 
     private fun searchForAMatchedLoader(file: File): IModelLoader?{

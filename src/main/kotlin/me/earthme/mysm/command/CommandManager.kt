@@ -12,6 +12,7 @@ class CommandManager {
         register(ReloadModelsCommand())
         register(SetModelNeedAuthCommand())
         register(SetPlayerModelCommand())
+        register(OpenManagementGUICommand())
     }
 
     fun register(impl: AbstractCommand) {

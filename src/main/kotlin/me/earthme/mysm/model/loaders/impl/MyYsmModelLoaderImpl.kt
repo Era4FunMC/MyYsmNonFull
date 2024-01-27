@@ -2,6 +2,7 @@ package me.earthme.mysm.model.loaders.impl
 
 import com.google.common.collect.Maps
 import me.earthme.mysm.ResourceConstants
+import me.earthme.mysm.data.mod.management.EnumModelFileType
 import me.earthme.mysm.model.IModelLoader
 import me.earthme.mysm.model.YsmModelData
 import me.earthme.mysm.utils.FileUtils
@@ -21,6 +22,10 @@ import javax.crypto.spec.SecretKeySpec
 class MyYsmModelLoaderImpl: IModelLoader{
     override fun canLoad(modelFile: File): Boolean {
         return !modelFile.isDirectory && modelFile.name.endsWith(".myysm")
+    }
+
+    override fun getFileType(): EnumModelFileType {
+        return EnumModelFileType.YSM_FILE_1
     }
 
     override fun loadModel(modelFile: File, authChecker: Function<String, Boolean>): YsmModelData {

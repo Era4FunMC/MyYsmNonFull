@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'gg.earthme.mysm'
-version = '1.6-Beta'
+version = '1.7-Universal'
 archivesBaseName = 'MyYsm'
 
 repositories {

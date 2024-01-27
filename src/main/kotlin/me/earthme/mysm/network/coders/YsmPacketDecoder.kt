@@ -7,6 +7,7 @@ import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.network.packets.c2s.YsmC2SCacheListPacket
 import me.earthme.mysm.network.packets.c2s.YsmC2SExtraAnimationPacket
 import me.earthme.mysm.network.packets.c2s.YsmC2SModelChangePacket
+import me.earthme.mysm.network.packets.c2s.YsmC2SUploadModelPacket
 import org.bukkit.NamespacedKey
 
 class YsmPacketDecoder (
@@ -22,6 +23,7 @@ class YsmPacketDecoder (
             registryMap[0] = YsmC2SCacheListPacket::class.java
             registryMap[7] = YsmC2SExtraAnimationPacket::class.java
             registryMap[5] = YsmC2SModelChangePacket::class.java
+            registryMap[11] = YsmC2SUploadModelPacket::class.java
 
             this.INSTANCE = YsmPacketDecoder(registryMap)
         }

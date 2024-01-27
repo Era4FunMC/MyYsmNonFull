@@ -1,5 +1,6 @@
 package me.earthme.mysm.model
 
+import me.earthme.mysm.data.mod.management.EnumModelFileType
 import java.io.File
 import java.util.function.Function
 
@@ -21,4 +22,6 @@ interface IModelLoader {
      * @return 加载好的模型数据
      */
     fun loadModel(modelFile: File,authChecker: Function<String,Boolean>): YsmModelData
+
+    fun getFileType(): EnumModelFileType
 }

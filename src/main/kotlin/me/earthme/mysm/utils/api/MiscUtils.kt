@@ -7,11 +7,13 @@ import me.earthme.mysm.manager.PlayerDataManager
 import me.earthme.mysm.model.loaders.GlobalModelLoader
 import me.earthme.mysm.network.YsmClientConnectionManager
 import me.earthme.mysm.network.YsmClientConnectionManager.getConnection
+import me.earthme.mysm.network.packets.s2c.YsmS2COpenManagementGUIPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CEntityActionPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2COwnedModelListPacket
 import org.bukkit.Bukkit
 import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
+import java.io.File
 
 /**
  * 算是暴露在外的API部分罢()
@@ -29,6 +31,34 @@ object MiscUtils {
             PlayerDataManager.setToDefaultIfIncorrect(player)
         }
         YsmClientConnectionManager.sendReloadToAllPlayers()
+    }
+
+    /**
+     *直接热加载单个模型文件，收模型加载器制约
+     * @param file 模型文件
+     */
+    @JvmStatic
+    fun hotLoadModelFile(file: File){
+        GlobalModelLoader.loadSingleModel(file)?.let {
+            VersionedCacheLoader.pushCacheForModel(it)
+            YsmClientConnectionManager.sendReloadToAllPlayers() //Resync
+        }
+    }
+
+    /**
+     * 给玩家打开管理GUI，这里没有权限检查
+     * @param player 目标玩家
+     */
+    @JvmStatic
+    fun openManagementGUIToPlayer(player: Player){
+        player.getConnection()?.let{
+            val modelDescList = GlobalModelLoader.getLoadedModelDesc()
+            val wrappedPacket = YsmS2COpenManagementGUIPacket(
+                modelDescList.first,
+                modelDescList.second
+            )
+            it.sendPacket(wrappedPacket)
+        }
     }
 
     /**

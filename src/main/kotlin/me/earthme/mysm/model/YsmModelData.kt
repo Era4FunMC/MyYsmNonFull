@@ -1,5 +1,7 @@
 package me.earthme.mysm.model
 
+import me.earthme.mysm.data.mod.management.EnumModelFileType
+import me.earthme.mysm.data.mod.management.YsmModelDesc
 import java.util.function.Function
 
 /**
@@ -12,6 +14,8 @@ class YsmModelData (
     private val animationData: Map<String, ByteArray>,
     private val textureData: Map<String, ByteArray>
 ){
+    private lateinit var modelData: YsmModelDesc
+
     fun getAllFiles(): Map<String,ByteArray>{
         val ret: MutableMap<String,ByteArray> = HashMap()
 
@@ -24,6 +28,36 @@ class YsmModelData (
         ret.putAll(this.textureData)
 
         return ret
+    }
+
+    fun getModelDesc(): YsmModelDesc {
+        return this.modelData
+    }
+
+    fun refreshDesc(fileType: EnumModelFileType){
+        this.modelData = YsmModelDesc(
+            this.modelName,
+            fileType,
+            this.computeDataSize()
+        )
+    }
+
+    private fun computeDataSize(): Long{
+        var sumCounter: Long = 0
+
+        for (metaData  in this.metaData){
+            sumCounter += metaData.value.size
+        }
+
+        for (metaData  in this.animationData){
+            sumCounter += metaData.value.size
+        }
+
+        for (metaData  in this.textureData){
+            sumCounter += metaData.value.size
+        }
+
+        return sumCounter
     }
 
     fun getModelName(): String{

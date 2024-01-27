@@ -2,6 +2,7 @@ package me.earthme.mysm.model.loaders.impl
 
 import com.google.common.collect.Maps
 import me.earthme.mysm.ResourceConstants
+import me.earthme.mysm.data.mod.management.EnumModelFileType
 import me.earthme.mysm.model.IModelLoader
 import me.earthme.mysm.model.YsmModelData
 import me.earthme.mysm.utils.FileUtils
@@ -11,6 +12,10 @@ import java.util.function.Function
 class ZipFileYsmLoaderImpl: IModelLoader {
     override fun canLoad(modelFile: File): Boolean {
         return !modelFile.isDirectory && modelFile.name.endsWith(".zip")
+    }
+
+    override fun getFileType(): EnumModelFileType {
+        return EnumModelFileType.ZIP_FILE
     }
 
     override fun loadModel(modelFile: File, authChecker: Function<String, Boolean>): YsmModelData {

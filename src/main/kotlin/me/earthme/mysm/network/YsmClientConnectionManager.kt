@@ -16,6 +16,7 @@ import me.earthme.mysm.network.connection.PlayerYsmConnection
 import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CSyncRequestPacket
 import me.earthme.mysm.utils.AsyncExecutor
+import me.earthme.mysm.utils.SchedulerUtils
 import me.earthme.mysm.utils.SchedulerUtils.schedulerAsExecutor
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readUtf
 import org.bukkit.Bukkit
@@ -26,6 +27,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.Plugin
+import org.bukkit.scheduler.BukkitScheduler
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.LockSupport
@@ -102,7 +104,9 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
             try {
                 for (singlePlayer in  Bukkit.getOnlinePlayers()){
-                    connectionMap[singlePlayer]?.tick()
+                    Bukkit.getScheduler().schedulerAsExecutor(singlePlayer.location).execute {
+                        connectionMap[singlePlayer]?.tick()
+                    }
                 }
             }catch (e: Exception){
                 e.printStackTrace()
@@ -187,6 +191,8 @@ object YsmClientConnectionManager : Listener, SimplePacketListenerAbstract(Packe
 
             val channelName = wrappedPluginMessage.channelName
             val channelData = wrappedPluginMessage.data
+
+            //println("Channel $channelName,Data: ${String(channelData)}")
 
             this.connectionMap[player]?.let{connection ->
                 this.processPacket(channelName,channelData,connection,player)
