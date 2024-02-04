@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'gg.earthme.mysm'
-version = '1.7-Universal'
+version = '1.8-Universal'
 archivesBaseName = 'MyYsm'
 
 repositories {
@@ -29,8 +29,8 @@ repositories {
 
 dependencies {
     compileOnly 'com.github.retrooper.packetevents:spigot:2.1.0'
-    compileOnly 'dev.folia:folia-api:1.20.1-R0.1-SNAPSHOT'
-    compileOnly 'io.netty:netty-all:4.1.86.Final'
+    compileOnly 'dev.folia:folia-api:1.20.2-R0.1-SNAPSHOT'
+    compileOnly 'io.netty:netty-all:4.1.106.Final'
     implementation 'com.alibaba:fastjson:1.2.83'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
     testImplementation 'org.jetbrains.kotlin:kotlin-test'

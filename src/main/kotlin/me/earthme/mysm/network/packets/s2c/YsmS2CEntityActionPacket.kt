@@ -23,14 +23,14 @@ class YsmS2CEntityActionPacket(
             FORGE -> {
                 val modelData = PlayerDataManager.createOrGetPlayerData(this.targetPlayer.name)
                 dataBuf.writeVarInt(this.targetPlayer.entityId)
-                dataBuf.writeBytes(YsmNbtUtils.createNbtForSync(modelData))
+                YsmNbtUtils.createNbtForSyncNew(modelData,dataBuf)
             }
 
             FABRIC -> {
                 val modelData = PlayerDataManager.createOrGetPlayerData(this.targetPlayer.name)
                 dataBuf.writeVarInt(this.targetPlayer.entityId)
                 dataBuf.writeUUID(this.targetPlayer.uniqueId)//Fabric only
-                dataBuf.writeBytes(YsmNbtUtils.createNbtForSync(modelData))
+                YsmNbtUtils.createNbtForSyncNew(modelData,dataBuf)
             }
 
             VANILLA -> {

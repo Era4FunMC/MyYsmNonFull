@@ -37,7 +37,7 @@ class MyYSM : JavaPlugin() {
         this.logger.info("  /_/  /_/\\__, / /_/____/_/ /_/ /_/ ")
         this.logger.info("         /____/                     ")
         this.logger.info("                                     ")
-        this.logger.info(" Version: 1.7.Universal Author: MoliaMC(Era4FunMC)")
+        this.logger.info(" Version: 1.8.Universal Author: MoliaMC(Era4FunMC)")
         this.logger.info("--------------------------------------------------")
 
         this.loadConfigValues()

@@ -1,26 +1,45 @@
 package me.earthme.mysm.utils.ysm
 
-import com.github.retrooper.packetevents.protocol.nbt.NBTByte
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound
-import com.github.retrooper.packetevents.protocol.nbt.NBTString
-import io.github.retrooper.packetevents.util.SpigotReflectionUtil
+import com.github.retrooper.packetevents.PacketEvents
+import io.netty.buffer.ByteBuf
 import me.earthme.mysm.data.PlayerModelData
+import org.bukkit.Bukkit
 import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 
 object YsmNbtUtils {
-    fun createNbtForSync(modelData: PlayerModelData): ByteArray{
-        val outStreamParentStream = ByteArrayOutputStream()
-        val outStream = DataOutputStream(outStreamParentStream)
-        val nbtTag = NBTCompound()
 
-        nbtTag.setTag("model_id",NBTString(modelData.mainResourceLocation.toString()))
-        nbtTag.setTag("select_texture",NBTString(modelData.mainTextPngResourceLocation.toString()))
-        nbtTag.setTag("animation",NBTString(modelData.currentAnimation))
-        nbtTag.setTag("play_animation",NBTByte(modelData.doAnimation))
+    fun createNbtForSyncNew(modelData: PlayerModelData,byteBuf: ByteBuf){
+        val bos: ByteArrayOutputStream = ByteArrayOutputStream()
+        val dos: DataOutputStream = DataOutputStream(bos)
+        dos.writeByte(10)
 
-        SpigotReflectionUtil.writeNmsNbtToStream(SpigotReflectionUtil.toMinecraftNBT(nbtTag),outStream)
+        Bukkit.getPlayer(modelData.username)?.let{
+            val protoVersion = PacketEvents.getAPI().playerManager.getClientVersion(it).protocolVersion
+            if (protoVersion < 764){
+                dos.writeUTF("")
+            }
+        }
 
-        return outStreamParentStream.toByteArray()
+        dos.writeByte(8)
+        dos.writeUTF("model_id")
+        dos.writeUTF(modelData.mainResourceLocation.toString())
+
+        dos.writeByte(8)
+        dos.writeUTF("select_texture")
+        dos.writeUTF(modelData.mainTextPngResourceLocation.toString())
+
+        dos.writeByte(8)
+        dos.writeUTF("animation")
+        dos.writeUTF(modelData.currentAnimation)
+
+        dos.writeByte(1)
+        dos.writeUTF("play_animation")
+        dos.writeByte(if (modelData.doAnimation){ 1 } else {0})
+
+        dos.writeByte(0)
+
+        byteBuf.writeBytes(bos.toByteArray())
     }
+
 }
