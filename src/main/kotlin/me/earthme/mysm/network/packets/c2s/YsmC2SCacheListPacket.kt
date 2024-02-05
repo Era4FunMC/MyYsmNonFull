@@ -12,17 +12,39 @@ import me.earthme.mysm.network.packets.IYsmPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CCacheHitPacket
 import me.earthme.mysm.network.packets.s2c.YsmS2CModelDataPacket
 import me.earthme.mysm.utils.AsyncExecutor
+import me.earthme.mysm.utils.AutoDiscardStack
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readUtf
 import me.earthme.mysm.utils.mc.MCPacketCodecUtils.readVarInt
 import me.earthme.mysm.utils.ysm.AESEncryptUtils
 import me.earthme.mysm.utils.ysm.YsmCodecUtil
 import org.bukkit.entity.Player
+import java.util.concurrent.ConcurrentHashMap
 
-//TODO - Limit the speed of this packet?
+
+
 class YsmC2SCacheListPacket : IYsmPacket {
+    private val maxRequestPerSec = 15
+    private val lastRequestTimes = ConcurrentHashMap<Player, AutoDiscardStack<Long>>()
     private val md5List: MutableList<String> = ArrayList()
 
+    private fun canProcessRequest(player: Player): Boolean {
+        // Create a AutoDiscardStack if not exist
+        if (!this.lastRequestTimes.containsKey(player)) {
+            this.lastRequestTimes[player] = AutoDiscardStack(maxRequestPerSec)
+            this.lastRequestTimes[player]!!.push(System.currentTimeMillis())
+            return true
+        }
+
+        // judge requests in one second
+        return (System.currentTimeMillis() - this.lastRequestTimes[player]!!.first) >= 1
+    }
+
     override fun process(connectionType: EnumConnectionType,player: Player) {
+        if (!this.canProcessRequest(player)) {
+            MyYSM.instance!!.logger.warning("${player.name()} is sending too many packets to MyYSM")
+            return
+        }
+
         val playerProtocolVersion = PacketEvents.getAPI().playerManager.getClientVersion(player).protocolVersion
         AsyncExecutor.ASYNC_EXECUTOR_INSTANCE.execute {
             //Add to the installed list
